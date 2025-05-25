@@ -1,0 +1,3 @@
+rootProject.name = 'pickmylunch'
+
+include 'api-server', 'batch-server', 'common'
