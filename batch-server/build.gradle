@@ -42,6 +42,10 @@ dependencies {
 	// spring boot
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	// Jackson
+	implementation 'com.fasterxml.jackson.core:jackson-core:2.18.3'
+	// commons codec
+	implementation 'commons-codec:commons-codec:1.18.0'
 }
 
 tasks.named('test') {
