@@ -1,8 +1,6 @@
 package com.pickmylunch.common.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -15,7 +13,7 @@ public class RawRestaurant {
     @Id
     private String id;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String jsonData;
 
     private String hash;
