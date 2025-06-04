@@ -23,5 +23,22 @@ services:
     depends_on:
       - db
 
+  batch-server:
+    build: ./batch-server
+    ports:
+      - "8081:8081"
+    environment:
+      - DB_URL=jdbc:postgresql://db:5432/${DB_NAME}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - API_KEY=${API_KEY}
+      - API_BASE_URL=${API_BASE_URL}
+      - API_SERVICE_NAME=${API_SERVICE_NAME}
+      - API_FORMAT_TYPE=${API_FORMAT_TYPE}
+      - API_PAGE_SIZE=${API_PAGE_SIZE}
+      - API_MAX_INDEX=${API_MAX_INDEX}
+    depends_on:
+      - db
+
 volumes:
   pgdata:

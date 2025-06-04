@@ -20,4 +20,12 @@ spring:
     jdbc:
       initialize-schema: ALWAYS
     job:
-      enabled: true
+      enabled: false
+
+api:
+  key: ${API_KEY}
+  base-url: ${API_BASE_URL}
+  service-name: ${API_SERVICE_NAME}
+  format-type: ${API_FORMAT_TYPE}
+  page-size: ${API_PAGE_SIZE}
+  max-index: ${API_MAX_INDEX}
