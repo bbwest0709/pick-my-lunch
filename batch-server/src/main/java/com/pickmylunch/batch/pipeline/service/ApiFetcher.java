@@ -3,9 +3,14 @@ package com.pickmylunch.batch.pipeline.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
+
+import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Service
@@ -26,6 +31,7 @@ public class ApiFetcher {
     @Value("${api.format-type}")
     private String formatType;
 
+    @Retryable(value = {WebClientResponseException.class, TimeoutException.class}, maxAttempts = 3, backoff = @Backoff(delay = 2000, multiplier = 2))
     public Mono<String> fetchData(int start, int end) {
         return webClient
                 .baseUrl(baseUrl)
