@@ -22,6 +22,7 @@ public class ApiJobConfig {
     public Job publicRestaurantApiJob(Step fetchRestaurantDataStep) {
         return new JobBuilder("publicRestaurantApiJob", jobRepository)
                 .start(fetchRestaurantDataStep)
+                .next(saveRestaurantDataStep())
                 .build();
     }
 
@@ -30,6 +31,16 @@ public class ApiJobConfig {
         return new StepBuilder("fetchRestaurantDataStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
                     apiService.executeRawDataLoad();
+                    return RepeatStatus.FINISHED;
+                }, transactionManager)
+                .build();
+    }
+
+    @Bean
+    public Step saveRestaurantDataStep() {
+        return new StepBuilder("saveRestaurantDataStep", jobRepository)
+                .tasklet((contribution, chunkContext) -> {
+                    apiService.processRawToRestaurant();
                     return RepeatStatus.FINISHED;
                 }, transactionManager)
                 .build();
