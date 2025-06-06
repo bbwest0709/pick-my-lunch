@@ -8,12 +8,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
 @EnableJpaAuditing
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {
+		"com.pickmylunch.common",
+		"com.pickmylunch.batch"
+})
 @EntityScan(basePackages = {"com.pickmylunch.common.entity"})
 public class BatchServerApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(BatchServerApplication.class, args);
 	}
-
 }

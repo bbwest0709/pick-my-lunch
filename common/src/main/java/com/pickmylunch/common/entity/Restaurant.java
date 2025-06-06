@@ -2,13 +2,13 @@ package com.pickmylunch.common.entity;
 
 import com.pickmylunch.common.entity.enums.Category;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.locationtech.jts.geom.Point;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Restaurant {
 
@@ -17,6 +17,8 @@ public class Restaurant {
 
     @Column(nullable = false)
     private String restaurantName;
+
+    private String restaurantTel;
 
     @Column(nullable = false)
     private String dosi;
