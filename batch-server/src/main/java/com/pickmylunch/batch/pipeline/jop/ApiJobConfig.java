@@ -48,6 +48,9 @@ public class ApiJobConfig {
                 .<RawRestaurant, RawRestaurant>chunk(apiPageSize, transactionManager)
                 .reader(rawRestaurantItemReader)
                 .writer(rawRestaurantItemWriter)
+                .faultTolerant()
+                .skip(Exception.class)
+                .skipLimit(20)
                 .build();
     }
 
@@ -58,6 +61,11 @@ public class ApiJobConfig {
                 .reader(rawRestaurantDbItemReader(entityManagerFactory))
                 .processor(restaurantItemProcessor)
                 .writer(restaurantItemWriter)
+                .faultTolerant()
+                .retryLimit(3)
+                .retry(Exception.class)
+                .skipLimit(20)
+                .skip(Exception.class)
                 .build();
     }
 
