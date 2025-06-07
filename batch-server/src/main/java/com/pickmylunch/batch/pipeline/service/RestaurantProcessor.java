@@ -31,7 +31,7 @@ public class RestaurantProcessor {
         List<RawRestaurant> rawRestaurants = rawRestaurantRepository.findAll();
 
         for (RawRestaurant rawRestaurant : rawRestaurants) {
-            if (rawRestaurant.isUpdated()) {
+            if (shouldUpdate(rawRestaurant)) {
                 try {
                     Restaurant restaurant = convertToProcessedRestaurant(rawRestaurant);
                     if (restaurant != null) {
@@ -46,13 +46,12 @@ public class RestaurantProcessor {
         }
     }
 
-    private Restaurant convertToProcessedRestaurant(RawRestaurant rawRestaurant) {
+    public Restaurant convertToProcessedRestaurant(RawRestaurant rawRestaurant) {
         try {
             JsonNode rootNode = objectMapper.readTree(rawRestaurant.getJsonData());
-
             Point location = extractLocation(rootNode);
-            if (location == null) {
-                log.warn("[warn] 위도/경도 정보 없음 - id: {}", rawRestaurant.getId());
+
+            if (shouldSkip(rootNode, rawRestaurant.getId(), location)) {
                 return null;
             }
 
@@ -93,5 +92,25 @@ public class RestaurantProcessor {
         double latitude = Double.parseDouble(y);
 
         return geometryUtil.createPoint(longitude, latitude);
+    }
+
+    public boolean shouldUpdate(RawRestaurant rawRestaurant) {
+        return rawRestaurant.isUpdated();
+    }
+
+    private boolean shouldSkip(JsonNode rootNode, String id, Point location) {
+        if (isClosed(rootNode) || location == null) {
+            if (isClosed(rootNode)) {
+                log.info("[info] 폐업 데이터 스킵 - id: {}", id);
+            } else {
+                log.warn("[warn] 위도/경도 정보 없음 - id: {}", id);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isClosed(JsonNode rootNode) {
+        return "폐업".equals(rootNode.path("TRDSTATENM").asText());
     }
 }
