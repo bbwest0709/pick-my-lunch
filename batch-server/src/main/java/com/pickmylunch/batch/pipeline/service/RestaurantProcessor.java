@@ -2,7 +2,7 @@ package com.pickmylunch.batch.pipeline.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pickmylunch.batch.pipeline.dto.AddressDto;
+import com.pickmylunch.batch.pipeline.util.dto.AddressDto;
 import com.pickmylunch.batch.pipeline.repository.RawRestaurantRepository;
 import com.pickmylunch.batch.pipeline.repository.RestaurantRepository;
 import com.pickmylunch.batch.pipeline.util.AddressParser;
