@@ -1,13 +1,16 @@
 package com.pickmylunch.batch.pipeline.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pickmylunch.batch.pipeline.repository.RawRestaurantRepository;
-import com.pickmylunch.common.entity.RawRestaurant;
+import com.pickmylunch.batch.pipeline.repository.*;
+import com.pickmylunch.batch.pipeline.util.*;
+import com.pickmylunch.batch.pipeline.util.dto.JsonFieldConstants;
+import com.pickmylunch.common.entity.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 @Slf4j
 @Service
@@ -15,21 +18,35 @@ import org.springframework.stereotype.Service;
 public class RawRestaurantProcessor {
 
     private final RawRestaurantRepository rawRestaurantRepository;
-    private final ObjectMapper objectMapper;
+    private final JsonUtil jsonUtil;
+
+    public List<RawRestaurant> parseOnly(String responseData, String serviceName) {
+        List<RawRestaurant> rawList = new ArrayList<>();
+        JsonNode rootNode = jsonUtil.safeReadTree(responseData);
+        JsonNode rowNodes = rootNode.path(serviceName).path("row");
+
+        for (JsonNode row : rowNodes) {
+            String id = row.path(JsonFieldConstants.MGTNO).asText();
+            String json = row.toString();
+
+            String hash = DigestUtils.sha256Hex(json.getBytes());
+
+            if (isChanged(id, hash)) {
+                RawRestaurant raw = createRawRestaurant(id, json, hash);
+                rawList.add(raw);
+            }
+        }
+        return rawList;
+    }
 
     public void processAndSave(String responseData, String serviceName) {
-        try {
-            JsonNode rootNode = objectMapper.readTree(responseData);
-            JsonNode rowNodes = rootNode.path(serviceName).path("row");
+        JsonNode rootNode = jsonUtil.safeReadTree(responseData);
+        JsonNode rowNodes = rootNode.path(serviceName).path("row");
 
-            for (JsonNode row : rowNodes) {
-                String id = row.path("MGTNO").asText();
-                String json = row.toString();
-                saveRawData(id, json);
-            }
-
-        } catch (Exception e) {
-            log.error("[fail] JSON 처리 실패 {}", e.getMessage());
+        for (JsonNode row : rowNodes) {
+            String id = row.path(JsonFieldConstants.MGTNO).asText();
+            String json = row.toString();
+            saveRawData(id, json);
         }
     }
 
@@ -38,9 +55,6 @@ public class RawRestaurantProcessor {
         if (isChanged(id, hash)) {
             RawRestaurant raw = createRawRestaurant(id, jsonData, hash);
             rawRestaurantRepository.save(raw);
-            log.info("[success] 원시 데이터 저장 - id : {}", id);
-        } else {
-            log.info("[success] 변경 없음 - ID: {}", id);
         }
     }
 

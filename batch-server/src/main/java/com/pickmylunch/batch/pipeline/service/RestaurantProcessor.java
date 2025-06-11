@@ -1,21 +1,20 @@
 package com.pickmylunch.batch.pipeline.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pickmylunch.batch.pipeline.dto.AddressDto;
-import com.pickmylunch.batch.pipeline.repository.RawRestaurantRepository;
-import com.pickmylunch.batch.pipeline.repository.RestaurantRepository;
+import com.pickmylunch.batch.pipeline.util.*;
+import com.pickmylunch.batch.pipeline.util.dto.*;
+import com.pickmylunch.batch.pipeline.repository.*;
 import com.pickmylunch.batch.pipeline.util.AddressParser;
-import com.pickmylunch.common.entity.RawRestaurant;
-import com.pickmylunch.common.entity.Restaurant;
+import com.pickmylunch.common.entity.*;
 import com.pickmylunch.common.entity.enums.Category;
-import com.pickmylunch.common.util.GeometryUtil;
+import com.pickmylunch.common.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -24,14 +23,14 @@ public class RestaurantProcessor {
 
     private final RawRestaurantRepository rawRestaurantRepository;
     private final RestaurantRepository restaurantRepository;
-    private final ObjectMapper objectMapper;
     private final GeometryUtil geometryUtil;
+    private final JsonUtil jsonUtil;
 
     public void processRawToRestaurant() {
         List<RawRestaurant> rawRestaurants = rawRestaurantRepository.findAll();
 
         for (RawRestaurant rawRestaurant : rawRestaurants) {
-            if (rawRestaurant.isUpdated()) {
+            if (shouldUpdate(rawRestaurant)) {
                 try {
                     Restaurant restaurant = convertToProcessedRestaurant(rawRestaurant);
                     if (restaurant != null) {
@@ -46,33 +45,25 @@ public class RestaurantProcessor {
         }
     }
 
-    private Restaurant convertToProcessedRestaurant(RawRestaurant rawRestaurant) {
-        try {
-            JsonNode rootNode = objectMapper.readTree(rawRestaurant.getJsonData());
+    public Restaurant convertToProcessedRestaurant(RawRestaurant rawRestaurant) {
+        JsonNode rootNode = jsonUtil.safeReadTree(rawRestaurant.getJsonData());
 
-            Point location = extractLocation(rootNode);
-            if (location == null) {
-                log.warn("[warn] 위도/경도 정보 없음 - id: {}", rawRestaurant.getId());
-                return null;
-            }
+        Point location = extractLocation(rootNode);
 
-            AddressDto jibunAddress = AddressParser.parse(rootNode.path("SITEWHLADDR").asText());
-            AddressDto doroAddress = AddressParser.parse(rootNode.path("RDNWHLADDR").asText());
+        if (shouldSkip(rootNode, location)) return null;
 
-            return toRestaurantEntity(rawRestaurant, rootNode, jibunAddress, doroAddress, location);
+        AddressDto jibunAddress = AddressParser.parse(rootNode.path(JsonFieldConstants.SITEWHLADDR).asText());
+        AddressDto doroAddress = AddressParser.parse(rootNode.path(JsonFieldConstants.RDNWHLADDR).asText());
 
-        } catch (Exception e) {
-            log.error("[fail] 데이터 파싱 실패 id: {}", rawRestaurant.getId(), e);
-            return null;
-        }
+        return toRestaurantEntity(rawRestaurant, rootNode, jibunAddress, doroAddress, location);
     }
 
     private Restaurant toRestaurantEntity(RawRestaurant rawRestaurant, JsonNode rootNode, AddressDto jibunAddress, AddressDto doroAddress, Point location) {
         return Restaurant.builder()
                 .id(rawRestaurant.getId())
-                .restaurantName(rootNode.path("BPLCNM").asText())
-                .category(Category.of(rootNode.path("UPTAENM").asText()))
-                .restaurantTel(rootNode.path("SITETEL").asText().replaceAll("\\s+", ""))
+                .restaurantName(rootNode.path(JsonFieldConstants.BPLCNM).asText())
+                .category(Category.of(rootNode.path(JsonFieldConstants.UPTAENM).asText()))
+                .restaurantTel(rootNode.path(JsonFieldConstants.SITETEL).asText().replaceAll("\\s+", ""))
                 .jibunDetailAddress(jibunAddress.detail())
                 .doroDetailAddress(doroAddress.detail())
                 .dosi(jibunAddress.dosi())
@@ -82,8 +73,8 @@ public class RestaurantProcessor {
     }
 
     private Point extractLocation(JsonNode rootNode) {
-        String x = rootNode.path("X").asText();
-        String y = rootNode.path("Y").asText();
+        String x = rootNode.path(JsonFieldConstants.X).asText();
+        String y = rootNode.path(JsonFieldConstants.Y).asText();
 
         if (x.isEmpty() || y.isEmpty()) {
             return null;
@@ -93,5 +84,17 @@ public class RestaurantProcessor {
         double latitude = Double.parseDouble(y);
 
         return geometryUtil.createPoint(longitude, latitude);
+    }
+
+    public boolean shouldUpdate(RawRestaurant rawRestaurant) {
+        return rawRestaurant.isUpdated();
+    }
+
+    private boolean shouldSkip(JsonNode rootNode, Point location) {
+        return isClosed(rootNode) || Objects.isNull(location);
+    }
+
+    private boolean isClosed(JsonNode rootNode) {
+        return JsonFieldConstants.CLOSED_STATUS.equals(rootNode.path(JsonFieldConstants.TRDSTATENM).asText());
     }
 }

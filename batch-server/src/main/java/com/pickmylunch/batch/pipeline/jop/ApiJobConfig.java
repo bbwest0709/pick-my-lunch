@@ -1,12 +1,20 @@
 package com.pickmylunch.batch.pipeline.jop;
 
-import com.pickmylunch.batch.pipeline.service.ApiService;
+import com.pickmylunch.batch.pipeline.step.RawRestaurantItemWriter;
+import com.pickmylunch.batch.pipeline.step.RestaurantItemProcessor;
+import com.pickmylunch.batch.pipeline.step.RawRestaurantItemReader;
+import com.pickmylunch.batch.pipeline.step.RestaurantItemWriter;
+import com.pickmylunch.common.entity.*;
+import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.batch.item.database.JpaPagingItemReader;
+import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -14,35 +22,61 @@ import org.springframework.transaction.PlatformTransactionManager;
 @RequiredArgsConstructor
 public class ApiJobConfig {
 
-    private final ApiService apiService;
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
+    private final EntityManagerFactory entityManagerFactory;
+    private final RawRestaurantItemReader rawRestaurantItemReader;
+    private final RestaurantItemProcessor restaurantItemProcessor;
+    private final RawRestaurantItemWriter rawRestaurantItemWriter;
+    private final RestaurantItemWriter restaurantItemWriter;
+
+    @Value("${api.page-size}")
+    private int apiPageSize;
 
     @Bean
-    public Job publicRestaurantApiJob(Step fetchRestaurantDataStep) {
+    public Job publicRestaurantApiJob(Step fetchRestaurantDataStep, Step restaurantProcessingStep) {
         return new JobBuilder("publicRestaurantApiJob", jobRepository)
+                .incrementer(new RunIdIncrementer())
                 .start(fetchRestaurantDataStep)
-                .next(saveRestaurantDataStep())
+                .next(restaurantProcessingStep)
                 .build();
     }
 
     @Bean
     public Step fetchRestaurantDataStep() {
         return new StepBuilder("fetchRestaurantDataStep", jobRepository)
-                .tasklet((contribution, chunkContext) -> {
-                    apiService.executeRawDataLoad();
-                    return RepeatStatus.FINISHED;
-                }, transactionManager)
+                .<RawRestaurant, RawRestaurant>chunk(apiPageSize, transactionManager)
+                .reader(rawRestaurantItemReader)
+                .writer(rawRestaurantItemWriter)
+                .faultTolerant()
+                .skip(Exception.class)
+                .skipLimit(20)
                 .build();
     }
 
     @Bean
-    public Step saveRestaurantDataStep() {
-        return new StepBuilder("saveRestaurantDataStep", jobRepository)
-                .tasklet((contribution, chunkContext) -> {
-                    apiService.processRawToRestaurant();
-                    return RepeatStatus.FINISHED;
-                }, transactionManager)
+    public Step restaurantProcessingStep() {
+        return new StepBuilder("restaurantProcessingStep", jobRepository)
+                .<RawRestaurant, Restaurant>chunk(apiPageSize, transactionManager)
+                .reader(rawRestaurantDbItemReader(entityManagerFactory))
+                .processor(restaurantItemProcessor)
+                .writer(restaurantItemWriter)
+                .faultTolerant()
+                .retryLimit(3)
+                .retry(Exception.class)
+                .skipLimit(20)
+                .skip(Exception.class)
                 .build();
     }
+
+    @Bean
+    public JpaPagingItemReader<RawRestaurant> rawRestaurantDbItemReader(EntityManagerFactory entityManagerFactory) {
+        return new JpaPagingItemReaderBuilder<RawRestaurant>()
+                .name("rawRestaurantDbItemReader")
+                .entityManagerFactory(entityManagerFactory)
+                .pageSize(apiPageSize)
+                .queryString("SELECT r FROM RawRestaurant r WHERE r.isUpdated = true")
+                .build();
+    }
+    
 }

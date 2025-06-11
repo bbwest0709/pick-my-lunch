@@ -1,6 +1,6 @@
 package com.pickmylunch.batch.pipeline.util;
 
-import com.pickmylunch.batch.pipeline.dto.AddressDto;
+import com.pickmylunch.batch.pipeline.util.dto.AddressDto;
 
 public class AddressParser {
     public static AddressDto parse(String address) {

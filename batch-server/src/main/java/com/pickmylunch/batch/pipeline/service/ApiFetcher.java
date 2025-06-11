@@ -44,6 +44,6 @@ public class ApiFetcher {
     }
 
     private String buildUri(int start, int end) {
-        return String.format("%s/%s/%s/%s/%d/%d", baseUrl, apiKey, formatType, serviceName, start, end);
+        return String.format("%s/%s/%s/%d/%d", apiKey, formatType, serviceName, start, end);
     }
 }
