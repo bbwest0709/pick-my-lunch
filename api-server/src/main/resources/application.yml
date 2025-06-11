@@ -16,6 +16,25 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+jwt:
+  prefix: 'Bearer '
+  secret-key: ${JWT}
+  access-token-validity-in-seconds: 1500
+  refresh-token-validity-in-seconds: 259200
+  access-header: Authentication
+  refresh-header: Refresh
+
+cookie:
+  limit-time: 259200
+  accepted-url: '/api/auth/reissue'
+  cookie-name: Refresh
+  domain: localhost
+
 logging:
   level:
     org.hibernate.SQL: DEBUG

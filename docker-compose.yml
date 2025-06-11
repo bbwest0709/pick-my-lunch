@@ -12,6 +12,13 @@ services:
       - pgdata:/var/lib/postgresql/data
     restart: always
 
+  redis:
+    image: redis:latest
+    container_name: pickmylunch-redis
+    ports:
+      - "6379:6379"
+    restart: always
+
   api-server:
     build: ./api-server
     ports:
@@ -20,8 +27,10 @@ services:
       - DB_URL=jdbc:postgresql://db:5432/${DB_NAME}
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
+      - JWT=${JWT}
     depends_on:
       - db
+      - redis
 
   batch-server:
     build: ./batch-server
