@@ -52,8 +52,8 @@ public class RestaurantProcessor {
 
         if (shouldSkip(rootNode, location)) return null;
 
-        AddressDto jibunAddress = AddressParser.parse(rootNode.path("SITEWHLADDR").asText());
-        AddressDto doroAddress = AddressParser.parse(rootNode.path("RDNWHLADDR").asText());
+        AddressDto jibunAddress = AddressParser.parse(rootNode.path(JsonFieldConstants.SITEWHLADDR).asText());
+        AddressDto doroAddress = AddressParser.parse(rootNode.path(JsonFieldConstants.RDNWHLADDR).asText());
 
         return toRestaurantEntity(rawRestaurant, rootNode, jibunAddress, doroAddress, location);
     }
@@ -61,9 +61,9 @@ public class RestaurantProcessor {
     private Restaurant toRestaurantEntity(RawRestaurant rawRestaurant, JsonNode rootNode, AddressDto jibunAddress, AddressDto doroAddress, Point location) {
         return Restaurant.builder()
                 .id(rawRestaurant.getId())
-                .restaurantName(rootNode.path("BPLCNM").asText())
-                .category(Category.of(rootNode.path("UPTAENM").asText()))
-                .restaurantTel(rootNode.path("SITETEL").asText().replaceAll("\\s+", ""))
+                .restaurantName(rootNode.path(JsonFieldConstants.BPLCNM).asText())
+                .category(Category.of(rootNode.path(JsonFieldConstants.UPTAENM).asText()))
+                .restaurantTel(rootNode.path(JsonFieldConstants.SITETEL).asText().replaceAll("\\s+", ""))
                 .jibunDetailAddress(jibunAddress.detail())
                 .doroDetailAddress(doroAddress.detail())
                 .dosi(jibunAddress.dosi())
@@ -73,8 +73,8 @@ public class RestaurantProcessor {
     }
 
     private Point extractLocation(JsonNode rootNode) {
-        String x = rootNode.path("X").asText();
-        String y = rootNode.path("Y").asText();
+        String x = rootNode.path(JsonFieldConstants.X).asText();
+        String y = rootNode.path(JsonFieldConstants.Y).asText();
 
         if (x.isEmpty() || y.isEmpty()) {
             return null;
@@ -95,6 +95,6 @@ public class RestaurantProcessor {
     }
 
     private boolean isClosed(JsonNode rootNode) {
-        return "폐업".equals(rootNode.path("TRDSTATENM").asText());
+        return JsonFieldConstants.CLOSED_STATUS.equals(rootNode.path(JsonFieldConstants.TRDSTATENM).asText());
     }
 }

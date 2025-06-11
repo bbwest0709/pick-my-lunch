@@ -3,6 +3,7 @@ package com.pickmylunch.batch.pipeline.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.pickmylunch.batch.pipeline.repository.*;
 import com.pickmylunch.batch.pipeline.util.*;
+import com.pickmylunch.batch.pipeline.util.dto.JsonFieldConstants;
 import com.pickmylunch.common.entity.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,7 @@ public class RawRestaurantProcessor {
         JsonNode rowNodes = rootNode.path(serviceName).path("row");
 
         for (JsonNode row : rowNodes) {
-            String id = row.path("MGTNO").asText();
+            String id = row.path(JsonFieldConstants.MGTNO).asText();
             String json = row.toString();
 
             String hash = DigestUtils.sha256Hex(json.getBytes());
@@ -45,7 +46,7 @@ public class RawRestaurantProcessor {
         JsonNode rowNodes = rootNode.path(serviceName).path("row");
 
         for (JsonNode row : rowNodes) {
-            String id = row.path("MGTNO").asText();
+            String id = row.path(JsonFieldConstants.MGTNO).asText();
             String json = row.toString();
             saveRawData(id, json);
         }
