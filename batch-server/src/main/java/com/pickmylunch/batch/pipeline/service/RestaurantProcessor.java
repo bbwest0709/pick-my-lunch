@@ -1,21 +1,20 @@
 package com.pickmylunch.batch.pipeline.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pickmylunch.batch.pipeline.util.dto.AddressDto;
-import com.pickmylunch.batch.pipeline.repository.RawRestaurantRepository;
-import com.pickmylunch.batch.pipeline.repository.RestaurantRepository;
+import com.pickmylunch.batch.pipeline.util.*;
+import com.pickmylunch.batch.pipeline.util.dto.*;
+import com.pickmylunch.batch.pipeline.repository.*;
 import com.pickmylunch.batch.pipeline.util.AddressParser;
-import com.pickmylunch.common.entity.RawRestaurant;
-import com.pickmylunch.common.entity.Restaurant;
+import com.pickmylunch.common.entity.*;
 import com.pickmylunch.common.entity.enums.Category;
-import com.pickmylunch.common.util.GeometryUtil;
+import com.pickmylunch.common.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -24,8 +23,8 @@ public class RestaurantProcessor {
 
     private final RawRestaurantRepository rawRestaurantRepository;
     private final RestaurantRepository restaurantRepository;
-    private final ObjectMapper objectMapper;
     private final GeometryUtil geometryUtil;
+    private final JsonUtil jsonUtil;
 
     public void processRawToRestaurant() {
         List<RawRestaurant> rawRestaurants = rawRestaurantRepository.findAll();
@@ -47,23 +46,16 @@ public class RestaurantProcessor {
     }
 
     public Restaurant convertToProcessedRestaurant(RawRestaurant rawRestaurant) {
-        try {
-            JsonNode rootNode = objectMapper.readTree(rawRestaurant.getJsonData());
-            Point location = extractLocation(rootNode);
+        JsonNode rootNode = jsonUtil.safeReadTree(rawRestaurant.getJsonData());
 
-            if (shouldSkip(rootNode, rawRestaurant.getId(), location)) {
-                return null;
-            }
+        Point location = extractLocation(rootNode);
 
-            AddressDto jibunAddress = AddressParser.parse(rootNode.path("SITEWHLADDR").asText());
-            AddressDto doroAddress = AddressParser.parse(rootNode.path("RDNWHLADDR").asText());
+        if (shouldSkip(rootNode, location)) return null;
 
-            return toRestaurantEntity(rawRestaurant, rootNode, jibunAddress, doroAddress, location);
+        AddressDto jibunAddress = AddressParser.parse(rootNode.path("SITEWHLADDR").asText());
+        AddressDto doroAddress = AddressParser.parse(rootNode.path("RDNWHLADDR").asText());
 
-        } catch (Exception e) {
-            log.error("[fail] 데이터 파싱 실패 id: {}", rawRestaurant.getId(), e);
-            return null;
-        }
+        return toRestaurantEntity(rawRestaurant, rootNode, jibunAddress, doroAddress, location);
     }
 
     private Restaurant toRestaurantEntity(RawRestaurant rawRestaurant, JsonNode rootNode, AddressDto jibunAddress, AddressDto doroAddress, Point location) {
@@ -98,16 +90,8 @@ public class RestaurantProcessor {
         return rawRestaurant.isUpdated();
     }
 
-    private boolean shouldSkip(JsonNode rootNode, String id, Point location) {
-        if (isClosed(rootNode) || location == null) {
-            if (isClosed(rootNode)) {
-                log.info("[info] 폐업 데이터 스킵 - id: {}", id);
-            } else {
-                log.warn("[warn] 위도/경도 정보 없음 - id: {}", id);
-            }
-            return true;
-        }
-        return false;
+    private boolean shouldSkip(JsonNode rootNode, Point location) {
+        return isClosed(rootNode) || Objects.isNull(location);
     }
 
     private boolean isClosed(JsonNode rootNode) {
