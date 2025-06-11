@@ -31,9 +31,7 @@ public class RawRestaurantProcessor {
 
             String hash = DigestUtils.sha256Hex(json.getBytes());
 
-            RawRestaurant existing = rawRestaurantRepository.findById(id).orElse(null);
-
-            if (existing == null || !existing.getHash().equals(hash)) {
+            if (isChanged(id, hash)) {
                 RawRestaurant raw = createRawRestaurant(id, json, hash);
                 rawList.add(raw);
             }
@@ -57,9 +55,6 @@ public class RawRestaurantProcessor {
         if (isChanged(id, hash)) {
             RawRestaurant raw = createRawRestaurant(id, jsonData, hash);
             rawRestaurantRepository.save(raw);
-            log.info("[success] 원시 데이터 저장 - id : {}", id);
-        } else {
-            log.info("[success] 변경 없음 - ID: {}", id);
         }
     }
 
