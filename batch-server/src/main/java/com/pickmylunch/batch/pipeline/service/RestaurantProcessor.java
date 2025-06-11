@@ -46,16 +46,22 @@ public class RestaurantProcessor {
     }
 
     public Restaurant convertToProcessedRestaurant(RawRestaurant rawRestaurant) {
-        JsonNode rootNode = jsonUtil.safeReadTree(rawRestaurant.getJsonData());
+        try {
+            JsonNode rootNode = jsonUtil.safeReadTree(rawRestaurant.getJsonData());
 
-        Point location = extractLocation(rootNode);
+            Point location = extractLocation(rootNode);
 
-        if (shouldSkip(rootNode, location)) return null;
+            if (shouldSkip(rootNode, location)) return null;
 
-        AddressDto jibunAddress = AddressParser.parse(rootNode.path(JsonFieldConstants.SITEWHLADDR).asText());
-        AddressDto doroAddress = AddressParser.parse(rootNode.path(JsonFieldConstants.RDNWHLADDR).asText());
+            AddressDto jibunAddress = AddressParser.parse(rootNode.path(JsonFieldConstants.SITEWHLADDR).asText());
+            AddressDto doroAddress = AddressParser.parse(rootNode.path(JsonFieldConstants.RDNWHLADDR).asText());
 
-        return toRestaurantEntity(rawRestaurant, rootNode, jibunAddress, doroAddress, location);
+            return toRestaurantEntity(rawRestaurant, rootNode, jibunAddress, doroAddress, location);
+
+        } catch (Exception e) {
+            log.error("[fail] 데이터 전처리 실패 id: {}", rawRestaurant.getId(), e);
+            throw e;
+        }
     }
 
     private Restaurant toRestaurantEntity(RawRestaurant rawRestaurant, JsonNode rootNode, AddressDto jibunAddress, AddressDto doroAddress, Point location) {
