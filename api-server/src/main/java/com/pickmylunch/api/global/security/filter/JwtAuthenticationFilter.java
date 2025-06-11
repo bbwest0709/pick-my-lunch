@@ -3,6 +3,7 @@ package com.pickmylunch.api.global.security.filter;
 import com.pickmylunch.api.global.security.details.AuthUser;
 import com.pickmylunch.api.global.security.dto.LoginDto;
 import com.pickmylunch.api.global.security.utils.ObjectMapperUtils;
+import com.pickmylunch.api.global.security.utils.cookie.CookieUtils;
 import com.pickmylunch.api.global.security.utils.jwt.JwtProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.*;
@@ -26,6 +27,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     private final ObjectMapperUtils objectMapper;
     private final JwtProvider jwtProvider;
+    private final CookieUtils cookieUtils;
 
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         LoginDto requestData = objectMapper.toEntity(request, LoginDto.class);
@@ -37,9 +39,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         AuthUser authUser = (AuthUser) authResult.getPrincipal();
 
         String accessToken = createAccessToken(authUser);
+        String refreshToken = createRefreshToken(authUser);
 
         response.setHeader(HttpHeaders.AUTHORIZATION, prefix + accessToken);
+        response.addCookie(cookieUtils.createCookie(refreshToken));
     }
+
 
     private UsernamePasswordAuthenticationToken createAuthenticationToken(LoginDto login) {
         return new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword());
@@ -49,6 +54,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         return jwtProvider.generateAccessToken(
                 authUser.getUsername(), authUser.getId(), toTrans(authUser.getAuthorities())
         );
+    }
+
+    private String createRefreshToken(AuthUser authUser) {
+        return jwtProvider.generateRefreshToken(authUser.getUsername());
     }
 
     private String toTrans(Collection<GrantedAuthority> list) {

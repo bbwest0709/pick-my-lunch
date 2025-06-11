@@ -18,16 +18,26 @@ public class JwtProvider {
     @Value("${jwt.access-token-validity-in-seconds}")
     private int accessTokenValidity;
 
-    public String generateAccessToken(String subject, Long id, String authorities) {
-        Date expiration = getAccessExpiration();
+    @Value("${jwt.refresh-token-validity-in-seconds}")
+    private int refreshTokenValidity;
 
+    public String generateAccessToken(String subject, Long id, String authorities) {
         return Jwts.builder()
                 .subject(subject)
-                .expiration(expiration)
+                .expiration(getAccessExpiration())
                 .claims(createClaims(id, authorities))
                 .signWith(getEncodeKey())
                 .compact();
     }
+
+    public String generateRefreshToken(String subject) {
+        return Jwts.builder()
+                .subject(subject)
+                .expiration(getRefreshExpiration())
+                .signWith(getEncodeKey())
+                .compact();
+    }
+
 
     private SecretKey getEncodeKey() {
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
@@ -39,6 +49,10 @@ public class JwtProvider {
 
     private Date getAccessExpiration() {
         return addExpirationData(accessTokenValidity).getTime();
+    }
+
+    private Date getRefreshExpiration() {
+        return addExpirationData(refreshTokenValidity).getTime();
     }
 
     private Calendar addExpirationData(Integer expirationMinutes) {
