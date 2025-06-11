@@ -1,14 +1,8 @@
 package com.pickmylunch.api.global.security.dto;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-public class LoginDto {
-    @NotNull private String username;
-    @NotNull private String password;
-}
+public record LoginDto(
+        @NotNull String username,
+        @NotNull String password
+) {}
