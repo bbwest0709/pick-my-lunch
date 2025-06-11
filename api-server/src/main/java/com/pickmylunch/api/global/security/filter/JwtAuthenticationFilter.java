@@ -2,8 +2,7 @@ package com.pickmylunch.api.global.security.filter;
 
 import com.pickmylunch.api.global.redis.RedisRepository;
 import com.pickmylunch.api.global.security.details.AuthUser;
-import com.pickmylunch.api.global.security.dto.LoginDto;
-import com.pickmylunch.api.global.security.dto.MemberInfo;
+import com.pickmylunch.api.global.security.dto.*;
 import com.pickmylunch.api.global.security.utils.ObjectMapperUtils;
 import com.pickmylunch.api.global.security.utils.cookie.CookieUtils;
 import com.pickmylunch.api.global.security.utils.jwt.JwtProvider;
@@ -27,6 +26,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Value("${jwt.prefix}")
     private String prefix;
 
+    @Value("${jwt.refresh-token-validity-in-seconds}")
+    private int refreshTokenValidity;
+
     private final ObjectMapperUtils objectMapper;
     private final JwtProvider jwtProvider;
     private final CookieUtils cookieUtils;
@@ -44,9 +46,20 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String accessToken = createAccessToken(authUser);
         String refreshToken = createRefreshToken(authUser);
 
+        repository.save(
+                refreshToken,
+                objectMapper.toStringValue(createUserInfo(authUser)),
+                refreshTokenValidity
+        );
+
         response.setHeader(HttpHeaders.AUTHORIZATION, prefix + accessToken);
         response.addCookie(cookieUtils.createCookie(refreshToken));
     }
+
+    private MemberInfo createUserInfo(AuthUser authUser) {
+        return new MemberInfo(authUser.getUsername(), toTrans(authUser.getAuthorities()));
+    }
+
 
     private UsernamePasswordAuthenticationToken createAuthenticationToken(LoginDto login) {
         return new UsernamePasswordAuthenticationToken(login.username(), login.password());
