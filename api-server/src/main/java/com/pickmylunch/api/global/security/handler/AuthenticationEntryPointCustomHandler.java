@@ -15,7 +15,7 @@ import java.io.*;
 
 @Component
 @RequiredArgsConstructor
-public class AuthenticationEntryPointHandler implements AuthenticationEntryPoint {
+public class AuthenticationEntryPointCustomHandler implements AuthenticationEntryPoint {
 
     private final ErrorResponseUtils errorResponse;
 

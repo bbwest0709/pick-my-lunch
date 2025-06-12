@@ -15,7 +15,7 @@ import java.io.IOException;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class VerificationAccessDeniedHandler implements AccessDeniedHandler {
+public class AccessDeniedCustomHandler implements AccessDeniedHandler {
 
     private final ErrorResponseUtils errorResponse;
 

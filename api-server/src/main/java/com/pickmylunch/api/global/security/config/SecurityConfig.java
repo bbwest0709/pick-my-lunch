@@ -3,6 +3,7 @@ package com.pickmylunch.api.global.security.config;
 import com.pickmylunch.api.global.security.handler.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.*;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.*;
@@ -20,8 +21,8 @@ import java.util.*;
 public class SecurityConfig {
 
     private final JwtFilterDsl jwtFilterDsl;
-    private final AuthenticationEntryPoint authenticationEntryPoint;
-    private final VerificationAccessDeniedHandler verificationAccessDeniedHandler;
+    private final AuthenticationEntryPointCustomHandler authenticationEntryPointCustomHandler;
+    private final AccessDeniedCustomHandler accessDeniedCustomHandler;
     private final LogoutSuccessCustomHandler logoutSuccessCustomHandler;
 
     @Bean
@@ -38,14 +39,11 @@ public class SecurityConfig {
         http.authorizeHttpRequests(
                         authorize ->
                                 authorize
-                                        .requestMatchers("/api/admin/**")
-                                        .hasRole("ADMIN")
-                                        .requestMatchers("/api/members")
-                                        .hasRole("MEMBER")
-                                        .requestMatchers("/api/members/login")
-                                        .permitAll()
-                                        .anyRequest()
-                                        .authenticated()
+                                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                                        .requestMatchers("/api/login", "/api/auth/reissue", "/api/members/exists").permitAll()
+                                        .requestMatchers(HttpMethod.POST, "/api/members").permitAll()
+                                        .requestMatchers(HttpMethod.GET, "/api/members").authenticated()
+                                        .anyRequest().authenticated()
                 )
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -56,8 +54,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable);
         http.exceptionHandling(
                 exception -> exception
-                        .authenticationEntryPoint(authenticationEntryPoint)
-                        .accessDeniedHandler(verificationAccessDeniedHandler)
+                        .authenticationEntryPoint(authenticationEntryPointCustomHandler)
+                        .accessDeniedHandler(accessDeniedCustomHandler)
         );
         http.logout(
                 logout -> logout.logoutSuccessHandler(logoutSuccessCustomHandler).logoutUrl("/api/logout")

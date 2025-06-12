@@ -1,8 +1,8 @@
 package com.pickmylunch.api.global.security.config;
 
 import com.pickmylunch.api.global.redis.RedisRepository;
-import com.pickmylunch.api.global.security.filter.JwtAuthenticationFilter;
-import com.pickmylunch.api.global.security.filter.JwtVerificationFilter;
+import com.pickmylunch.api.global.security.filter.*;
+import com.pickmylunch.api.global.security.handler.*;
 import com.pickmylunch.api.global.security.utils.ObjectMapperUtils;
 import com.pickmylunch.api.global.security.utils.cookie.CookieUtils;
 import com.pickmylunch.api.global.security.utils.jwt.JwtProvider;
@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -21,7 +20,7 @@ public class JwtFilterDsl extends AbstractHttpConfigurer<JwtFilterDsl, HttpSecur
     private final JwtProvider jwtProvider;
     private final CookieUtils cookieUtils;
     private final RedisRepository repository;
-    private final AuthenticationFailureHandler authenticationFailureHandler;
+    private final AuthenticationFailureCustomHandler authenticationFailureCustomHandler;
 
     public void configure(HttpSecurity builder) {
         AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
@@ -30,7 +29,7 @@ public class JwtFilterDsl extends AbstractHttpConfigurer<JwtFilterDsl, HttpSecur
 
         jwtAuthenticationFilter.setFilterProcessesUrl("/api/login");
         jwtAuthenticationFilter.setAuthenticationManager(authenticationManager);
-        jwtAuthenticationFilter.setAuthenticationFailureHandler(authenticationFailureHandler);
+        jwtAuthenticationFilter.setAuthenticationFailureHandler(authenticationFailureCustomHandler);
 
         JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtProvider);
 
