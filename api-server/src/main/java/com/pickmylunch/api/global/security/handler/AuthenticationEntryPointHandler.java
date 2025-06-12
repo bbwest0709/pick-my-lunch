@@ -1,14 +1,12 @@
 package com.pickmylunch.api.global.security.handler;
 
-import com.pickmylunch.api.global.exception.ErrorResponse;
 import com.pickmylunch.api.global.exception.code.AuthExceptionCode;
-import com.pickmylunch.api.global.security.utils.ObjectMapperUtils;
+import com.pickmylunch.api.global.security.utils.ErrorResponseUtils;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -19,12 +17,12 @@ import java.io.*;
 @RequiredArgsConstructor
 public class AuthenticationEntryPointHandler implements AuthenticationEntryPoint {
 
-    private final ObjectMapperUtils objectMapper;
+    private final ErrorResponseUtils errorResponse;
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         AuthExceptionCode exceptionCode = getExceptionCodeByRequest(request);
-        sendError(response, exceptionCode);
+        errorResponse.sendError(response, exceptionCode);
     }
 
     private AuthExceptionCode getExceptionCodeByRequest(HttpServletRequest request) {
@@ -44,20 +42,5 @@ public class AuthenticationEntryPointHandler implements AuthenticationEntryPoint
         } else {
             return AuthExceptionCode.UNAUTHENTICATED;
         }
-    }
-
-    private void sendError(HttpServletResponse response, AuthExceptionCode authExceptionCode) throws IOException {
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("utf-8");
-        response.setStatus(authExceptionCode.getHttpStatus().value());
-        response.getWriter().write(getResponseData(authExceptionCode));
-    }
-
-    private String getResponseData(AuthExceptionCode authExceptionCode) {
-        return objectMapper.toStringValue(createErrorResponse(authExceptionCode));
-    }
-
-    private ErrorResponse createErrorResponse(AuthExceptionCode authExceptionCode) {
-        return ErrorResponse.of(authExceptionCode.getHttpStatus(), authExceptionCode.getMessage());
     }
 }
