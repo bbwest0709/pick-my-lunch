@@ -23,7 +23,7 @@ public class ObjectMapperUtils {
         }
     }
 
-    public <T> T toENtity(String content, Class<T> valueType) {
+    public <T> T toEntity(String content, Class<T> valueType) {
         try {
             return objectMapper.readValue(content, valueType);
         } catch (IOException e) {
