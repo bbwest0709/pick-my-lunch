@@ -1,15 +1,15 @@
 package com.pickmylunch.api.global.security.config;
 
+import com.pickmylunch.api.global.security.handler.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.*;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.*;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.*;
 import org.springframework.web.cors.*;
 
 import java.util.*;
@@ -20,6 +20,9 @@ import java.util.*;
 public class SecurityConfig {
 
     private final JwtFilterDsl jwtFilterDsl;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final VerificationAccessDeniedHandler verificationAccessDeniedHandler;
+    private final LogoutSuccessCustomHandler logoutSuccessCustomHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -51,6 +54,14 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(apiConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable);
+        http.exceptionHandling(
+                exception -> exception
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(verificationAccessDeniedHandler)
+        );
+        http.logout(
+                logout -> logout.logoutSuccessHandler(logoutSuccessCustomHandler).logoutUrl("/api/logout")
+        );
         return http.build();
     }
 
