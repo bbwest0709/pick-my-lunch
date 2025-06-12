@@ -1,11 +1,10 @@
 package com.pickmylunch.api.global.exception.code;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.springframework.http.HttpStatus;
 
 @Getter
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum CommonExceptionCode implements ExceptionCode {
     TRANS_ENTITY_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Entity 변환 에러"),
     TRANS_JSON_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "JSON 변환 에러");
