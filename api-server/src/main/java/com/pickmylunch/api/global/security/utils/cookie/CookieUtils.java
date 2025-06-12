@@ -1,5 +1,7 @@
 package com.pickmylunch.api.global.security.utils.cookie;
 
+import com.pickmylunch.api.global.exception.BusinessLogicException;
+import com.pickmylunch.api.global.exception.code.AuthExceptionCode;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,18 +41,18 @@ public class CookieUtils {
         return cookie;
     }
 
-    private Cookie searchCookieProperties(HttpServletRequest request) {
-        return Arrays.stream(validCookiesExist(request))
-                .filter(cookie -> cookie.getName().equals(cookieName))
-                .findFirst()
-                .orElse(new Cookie(cookieName, ""));
-    }
-
     private Cookie searchCookieProperties(Cookie[] cookies) {
         return Arrays.stream(cookies)
                 .filter(cookie -> cookie.getName().equals(cookieName))
                 .findFirst()
                 .orElse(new Cookie(cookieName, ""));
+    }
+
+    public Cookie searchCookieProperties(HttpServletRequest request) {
+        return Arrays.stream(validCookiesExist(request))
+                .filter(cookie -> cookie.getName().equals(cookieName))
+                .findFirst()
+                .orElseThrow(() -> new BusinessLogicException(AuthExceptionCode.REFRESH_TOKEN_EXPIRED));
     }
 
     private Cookie[] validCookiesExist(HttpServletRequest request) {
