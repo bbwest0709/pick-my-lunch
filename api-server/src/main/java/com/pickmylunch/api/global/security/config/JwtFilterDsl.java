@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,6 +21,7 @@ public class JwtFilterDsl extends AbstractHttpConfigurer<JwtFilterDsl, HttpSecur
     private final JwtProvider jwtProvider;
     private final CookieUtils cookieUtils;
     private final RedisRepository repository;
+    private final AuthenticationFailureHandler authenticationFailureHandler;
 
     public void configure(HttpSecurity builder) {
         AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
@@ -28,6 +30,7 @@ public class JwtFilterDsl extends AbstractHttpConfigurer<JwtFilterDsl, HttpSecur
 
         jwtAuthenticationFilter.setFilterProcessesUrl("/api/login");
         jwtAuthenticationFilter.setAuthenticationManager(authenticationManager);
+        jwtAuthenticationFilter.setAuthenticationFailureHandler(authenticationFailureHandler);
 
         JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtProvider);
 
