@@ -18,9 +18,9 @@ public class ErrorResponseUtils {
     public void sendError(HttpServletResponse response, AuthExceptionCode authExceptionCode) throws IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
+        response.setStatus(authExceptionCode.getHttpStatus().value());
         response.getWriter().write(toErrorResponseString(authExceptionCode));
         response.getWriter().flush();
-
     }
 
     public String toErrorResponseString(AuthExceptionCode authExceptionCode) {
