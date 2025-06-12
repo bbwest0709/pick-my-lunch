@@ -15,10 +15,13 @@ public class JwtProvider {
     @Value("${jwt.secret-key}")
     private String secretKey;
 
-    @Value("${jwt.access-token-validity-in-seconds}")
+    @Value("${jwt.prefix}")
+    private String prefix;
+
+    @Value("${jwt.access-token-validity-in-minutes}")
     private int accessTokenValidity;
 
-    @Value("${jwt.refresh-token-validity-in-seconds}")
+    @Value("${jwt.refresh-token-validity-in-minutes}")
     private int refreshTokenValidity;
 
     public String generateAccessToken(String subject, Long id, String authorities) {
@@ -65,8 +68,15 @@ public class JwtProvider {
 
     private Calendar addExpirationData(Integer expirationMinutes) {
         Calendar now = Calendar.getInstance();
-        now.add(Calendar.SECOND, expirationMinutes);
+        now.add(Calendar.MINUTE, expirationMinutes);
         return now;
     }
 
+    public Integer getRefreshTokenValidityInMinutes() {
+        return refreshTokenValidity;
+    }
+
+    public String getPrefix() {
+        return prefix;
+    }
 }

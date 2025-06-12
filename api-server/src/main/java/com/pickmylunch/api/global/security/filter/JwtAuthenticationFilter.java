@@ -23,12 +23,6 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    @Value("${jwt.prefix}")
-    private String prefix;
-
-    @Value("${jwt.refresh-token-validity-in-seconds}")
-    private int refreshTokenValidity;
-
     private final ObjectMapperUtils objectMapper;
     private final JwtProvider jwtProvider;
     private final CookieUtils cookieUtils;
@@ -49,10 +43,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         repository.save(
                 refreshToken,
                 objectMapper.toStringValue(createUserInfo(authUser)),
-                refreshTokenValidity
+                jwtProvider.getRefreshTokenValidityInMinutes()
         );
 
-        response.setHeader(HttpHeaders.AUTHORIZATION, prefix + accessToken);
+        response.setHeader(HttpHeaders.AUTHORIZATION, jwtProvider.getPrefix() + accessToken);
         response.addCookie(cookieUtils.createCookie(refreshToken));
     }
 
@@ -60,9 +54,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         return new MemberInfo(authUser.getUsername(), toTrans(authUser.getAuthorities()));
     }
 
-
     private UsernamePasswordAuthenticationToken createAuthenticationToken(LoginDto login) {
-        return new UsernamePasswordAuthenticationToken(login.username(), login.password());
+        return new UsernamePasswordAuthenticationToken(login.memberName(), login.password());
     }
 
     private String createAccessToken(AuthUser authUser) {
@@ -78,4 +71,5 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private String toTrans(Collection<GrantedAuthority> list) {
         return StringUtils.collectionToCommaDelimitedString(list);
     }
+
 }

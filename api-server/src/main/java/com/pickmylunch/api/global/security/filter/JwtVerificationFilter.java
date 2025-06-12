@@ -3,7 +3,9 @@ package com.pickmylunch.api.global.security.filter;
 import com.pickmylunch.api.global.exception.code.AuthExceptionCode;
 import com.pickmylunch.api.global.security.details.AuthUser;
 import com.pickmylunch.api.global.security.utils.jwt.JwtProvider;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import lombok.RequiredArgsConstructor;
@@ -17,13 +19,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import io.jsonwebtoken.security.SignatureException;
-
 @Slf4j
 @RequiredArgsConstructor
 public class JwtVerificationFilter extends OncePerRequestFilter {
-    @Value("${jwt.prefix}")
-    private String prefix;
 
     private final JwtProvider jwtProvider;
 
@@ -47,7 +45,7 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
     }
 
     private AuthUser createUserDetail(HttpServletRequest request) {
-        String token = getAuthenticationTokenToHeader(request).substring(prefix.length());
+        String token = getAuthenticationTokenToHeader(request).substring(jwtProvider.getPrefix().length());
         return new AuthUser(jwtProvider.getClaims(token));
     }
 

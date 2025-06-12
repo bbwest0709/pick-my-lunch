@@ -12,7 +12,7 @@ public class AuthUser extends User {
     private final Long id;
 
     public AuthUser(Member member) {
-        super(member.getEmail(),
+        super(member.getMemberName(),
                 member.getPassword(),
                 AuthorityUtils.createAuthorityList(member.getRole().getRole()));
         this.id = member.getId();
