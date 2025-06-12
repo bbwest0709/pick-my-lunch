@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+
 import io.jsonwebtoken.security.SignatureException;
 
 @Slf4j
@@ -24,20 +25,14 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
     @Value("${jwt.prefix}")
     private String prefix;
 
-    private static String EXCEPTION_CODE = "exceptionCode";
     private final JwtProvider jwtProvider;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             setAuthenticationToContext(request);
-        } catch (ExpiredJwtException e) {
-            request.setAttribute(EXCEPTION_CODE, AuthExceptionCode.ACCESS_TOKEN_EXPIRED);
-        } catch (SignatureException e) {
-            request.setAttribute(EXCEPTION_CODE, AuthExceptionCode.INVALID_SIGNATURE_ACCESS_TOKEN);
-        } catch (JwtException e) {
-            log.warn("[exception] : {}, message: {}", e.getClass(), e.getMessage());
-            request.setAttribute(EXCEPTION_CODE, AuthExceptionCode.UNAUTHENTICATED);
+        } catch (Exception e) {
+            request.setAttribute("exception", e);
         }
         filterChain.doFilter(request, response);
     }
