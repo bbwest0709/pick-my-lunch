@@ -18,21 +18,21 @@ spring:
 
   data:
     redis:
-      host: localhost
+      host: redis
       port: 6379
 
 jwt:
   prefix: 'Bearer '
   secret-key: ${JWT}
-  access-token-validity-in-seconds: 1500
-  refresh-token-validity-in-seconds: 259200
+  access-token-validity-in-minutes: 25
+  refresh-token-validity-in-minutes: 4320
   access-header: Authentication
   refresh-header: Refresh
 
 cookie:
   limit-time: 259200
   accepted-url: '/api/auth/reissue'
-  cookie-name: Refresh
+  cookie-name: refresh-token
   domain: localhost
 
 logging:
