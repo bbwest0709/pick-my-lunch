@@ -16,7 +16,9 @@ public enum AuthExceptionCode implements ExceptionCode {
     EMPTY_JWT_CLAIMS(HttpStatus.UNAUTHORIZED, "JWT 클레임이 비어 있습니다."),
     JWT_PROCESSING_ERROR(HttpStatus.UNAUTHORIZED, "JWT 토큰 처리 중 오류가 발생했습니다."),
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "권한이 없습니다. 접근이 거부되었습니다."),
-    
+    REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "저장된 RefreshToken이 존재하지 않습니다."),
+    REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "RefreshToken 기간이 만료 되었습니다."),
+
     // 권한 관련 오류
     AUTHENTICATION_FAILURE(HttpStatus.UNAUTHORIZED, "인증에 실패했습니다."),
     ;
