@@ -27,5 +27,6 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private MemberRole role;
 
+    @Builder.Default
     private boolean active = true;
 }
