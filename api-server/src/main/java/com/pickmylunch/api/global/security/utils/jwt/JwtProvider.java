@@ -1,6 +1,6 @@
 package com.pickmylunch.api.global.security.utils.jwt;
 
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -38,6 +38,14 @@ public class JwtProvider {
                 .compact();
     }
 
+    public Claims getClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(getEncodeKey())
+                .clockSkewSeconds(60)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
 
     private SecretKey getEncodeKey() {
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
@@ -60,4 +68,5 @@ public class JwtProvider {
         now.add(Calendar.SECOND, expirationMinutes);
         return now;
     }
+
 }
