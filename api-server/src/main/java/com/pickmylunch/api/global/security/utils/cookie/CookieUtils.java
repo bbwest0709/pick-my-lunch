@@ -1,8 +1,11 @@
 package com.pickmylunch.api.global.security.utils.cookie;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class CookieUtils {
@@ -28,5 +31,29 @@ public class CookieUtils {
         cookie.setPath(cookieAcceptedUrl);
         cookie.setMaxAge(cookieLimitTime);
         return cookie;
+    }
+
+    public Cookie deleteCookie(HttpServletRequest request) {
+        Cookie cookie = searchCookieProperties(validCookiesExist(request));
+        cookie.setMaxAge(0);
+        return cookie;
+    }
+
+    private Cookie searchCookieProperties(HttpServletRequest request) {
+        return Arrays.stream(validCookiesExist(request))
+                .filter(cookie -> cookie.getName().equals(cookieName))
+                .findFirst()
+                .orElse(new Cookie(cookieName, ""));
+    }
+
+    private Cookie searchCookieProperties(Cookie[] cookies) {
+        return Arrays.stream(cookies)
+                .filter(cookie -> cookie.getName().equals(cookieName))
+                .findFirst()
+                .orElse(new Cookie(cookieName, ""));
+    }
+
+    private Cookie[] validCookiesExist(HttpServletRequest request) {
+        return Optional.ofNullable(request.getCookies()).orElse(new Cookie[] {});
     }
 }
