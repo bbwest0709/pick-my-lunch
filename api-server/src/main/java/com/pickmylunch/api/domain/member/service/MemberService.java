@@ -1,8 +1,8 @@
 package com.pickmylunch.api.domain.member.service;
 
 import com.pickmylunch.api.domain.member.MemberProperties;
-import com.pickmylunch.api.domain.member.dto.request.RegisterDto;
-import com.pickmylunch.api.domain.member.dto.response.MemberResponseDto;
+import com.pickmylunch.api.domain.member.dto.request.*;
+import com.pickmylunch.api.domain.member.dto.response.*;
 import com.pickmylunch.api.domain.member.repository.MemberRepository;
 import com.pickmylunch.api.global.exception.BusinessLogicException;
 import com.pickmylunch.api.global.exception.code.MemberExceptionCode;
@@ -52,4 +52,11 @@ public class MemberService {
         memberRepository.save(member);
     }
 
+    public void deactivateMember(long id) {
+        Member member = getMemberById(id);
+        member.deactivate();
+        member.updateRecommendationOptIn(false);
+        member.anonymize(memberProperties.getAnonymizedName(), memberProperties.getAnonymizedEmail());
+        memberRepository.save(member);
+    }
 }

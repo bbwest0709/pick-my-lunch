@@ -35,4 +35,13 @@ public class Member extends BaseEntity {
     public void updateRecommendationOptIn(boolean enabled) {
         this.recommendationOptIn = enabled;
     }
+
+    public void deactivate() {
+        this.active = false;
+    }
+
+    public void anonymize(String anonymizedName, String anonymizedEmail) {
+        this.memberName = anonymizedName;
+        this.email = anonymizedEmail;
+    }
 }

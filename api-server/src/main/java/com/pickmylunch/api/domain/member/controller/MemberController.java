@@ -1,8 +1,8 @@
 package com.pickmylunch.api.domain.member.controller;
 
-import com.pickmylunch.api.domain.member.dto.request.RegisterDto;
-import com.pickmylunch.api.domain.member.dto.response.MemberResponseDto;
-import com.pickmylunch.api.domain.member.service.MemberService;
+import com.pickmylunch.api.domain.member.dto.request.*;
+import com.pickmylunch.api.domain.member.dto.response.*;
+import com.pickmylunch.api.domain.member.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,7 @@ public class MemberController {
         return ResponseEntity.status(201).build();
     }
 
-        @GetMapping("/exists/member-name")
+    @GetMapping("/exists/member-name")
     public ResponseEntity<Boolean> checkDuplicateMemberName(@RequestParam String memberName) {
         boolean exists = memberService.isMemberNameExist(memberName);
         return ResponseEntity.ok(exists);
@@ -43,5 +43,11 @@ public class MemberController {
     public ResponseEntity<Void> updateRecommendationAlerts(@AuthenticationPrincipal Long id, @RequestParam("enabled") boolean enabled) {
         memberService.updateRecommendationAlertsEnabled(id, enabled);
         return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/me")
+    public ResponseEntity<Void> withdrawMember(@AuthenticationPrincipal Long id) {
+        memberService.deactivateMember(id);
+        return ResponseEntity.noContent().build();
     }
 }
