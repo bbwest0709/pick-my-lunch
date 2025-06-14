@@ -45,8 +45,12 @@ dependencies {
 	runtimeOnly 'org.postgresql:postgresql'
 	implementation 'org.hibernate:hibernate-spatial:6.5.2.Final'
 	implementation 'org.locationtech.jts:jts-core:1.18.0'
+	// redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	// jpa
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    // validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
