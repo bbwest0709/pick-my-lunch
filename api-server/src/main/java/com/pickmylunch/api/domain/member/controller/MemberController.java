@@ -1,8 +1,12 @@
 package com.pickmylunch.api.domain.member.controller;
 
+import com.pickmylunch.api.domain.member.dto.request.RegisterDto;
+import com.pickmylunch.api.domain.member.dto.response.MemberResponseDto;
 import com.pickmylunch.api.domain.member.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -12,7 +16,13 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping("/exists/member-name")
+    @PostMapping
+    public ResponseEntity<Void> register(@Valid @RequestBody RegisterDto dto) {
+        memberService.register(dto);
+        return ResponseEntity.status(201).build();
+    }
+
+        @GetMapping("/exists/member-name")
     public ResponseEntity<Boolean> checkDuplicateMemberName(@RequestParam String memberName) {
         boolean exists = memberService.isMemberNameExist(memberName);
         return ResponseEntity.ok(exists);
