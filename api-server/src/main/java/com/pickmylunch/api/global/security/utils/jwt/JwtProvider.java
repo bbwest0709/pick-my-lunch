@@ -2,7 +2,7 @@ package com.pickmylunch.api.global.security.utils.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -10,33 +10,24 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Component
+@RequiredArgsConstructor
 public class JwtProvider {
 
-    @Value("${jwt.secret-key}")
-    private String secretKey;
-
-    @Value("${jwt.prefix}")
-    private String prefix;
-
-    @Value("${jwt.access-token-validity-in-minutes}")
-    private int accessTokenValidity;
-
-    @Value("${jwt.refresh-token-validity-in-minutes}")
-    private int refreshTokenValidity;
+    private final JwtProperties jwtProperties;
 
     public String generateAccessToken(String subject, Long id, String authorities) {
         return Jwts.builder()
-                .subject(subject)
-                .expiration(getAccessExpiration())
-                .claims(createClaims(id, authorities))
+                .setSubject(subject)
+                .setExpiration(getAccessExpiration())
+                .addClaims(createClaims(id, authorities))
                 .signWith(getEncodeKey())
                 .compact();
     }
 
     public String generateRefreshToken(String subject) {
         return Jwts.builder()
-                .subject(subject)
-                .expiration(getRefreshExpiration())
+                .setSubject(subject)
+                .setExpiration(getRefreshExpiration())
                 .signWith(getEncodeKey())
                 .compact();
     }
@@ -51,32 +42,32 @@ public class JwtProvider {
     }
 
     private SecretKey getEncodeKey() {
-        return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+        return Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
     }
 
-    private Map<String, ?> createClaims(Long id, String authorities) {
+    private Map<String, Object> createClaims(Long id, String authorities) {
         return Map.of("id", id, "authorities", authorities);
     }
 
     private Date getAccessExpiration() {
-        return addExpirationData(accessTokenValidity).getTime();
+        return addExpirationData(jwtProperties.getAccessTokenValidityInMinutes()).getTime();
     }
 
     private Date getRefreshExpiration() {
-        return addExpirationData(refreshTokenValidity).getTime();
+        return addExpirationData(jwtProperties.getRefreshTokenValidityInMinutes()).getTime();
     }
 
-    private Calendar addExpirationData(Integer expirationMinutes) {
+    private Calendar addExpirationData(int expirationMinutes) {
         Calendar now = Calendar.getInstance();
         now.add(Calendar.MINUTE, expirationMinutes);
         return now;
     }
 
-    public Integer getRefreshTokenValidityInMinutes() {
-        return refreshTokenValidity;
+    public int getRefreshTokenValidityInMinutes() {
+        return jwtProperties.getRefreshTokenValidityInMinutes();
     }
 
     public String getPrefix() {
-        return prefix;
+        return jwtProperties.getPrefix();
     }
 }

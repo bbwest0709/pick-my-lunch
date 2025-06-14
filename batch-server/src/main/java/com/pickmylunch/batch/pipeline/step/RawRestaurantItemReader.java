@@ -19,15 +19,7 @@ public class RawRestaurantItemReader implements ItemReader<RawRestaurant> {
 
     private final ApiFetcher apiFetcher;
     private final RawRestaurantProcessor rawRestaurantProcessor;
-
-    @Value("${api.page-size}")
-    private int pageSize;
-
-//    @Value("${api.max-index}")
-//    private int maxIndex;
-
-    @Value("${api.service-name}")
-    private String serviceName;
+    private final ApiProperties apiProperties;
 
     private int start = 1;
     private int totalCount = -1;
@@ -48,17 +40,17 @@ public class RawRestaurantItemReader implements ItemReader<RawRestaurant> {
                     log.info("[info] 총 데이터 개수: {}", totalCount);
                 }
 
-                int end = Math.min(start + pageSize - 1, totalCount);
+                int end = Math.min(start + apiProperties.getPageSize() - 1, totalCount);
                 log.info("[start] 데이터 호출 시작: {} ~ {}", start, end);
                 String response = apiFetcher.fetchData(start, end).block();
 
                 if (response != null) {
-                    List<RawRestaurant> rawList = rawRestaurantProcessor.parseOnly(response, serviceName);
+                    List<RawRestaurant> rawList = rawRestaurantProcessor.parseOnly(response, apiProperties.getServiceName());
                     rawRestaurantIterator = rawList.iterator();
                 } else {
                     rawRestaurantIterator = Collections.emptyIterator();
                 }
-                start += pageSize;
+                start += apiProperties.getPageSize();
 
             } catch (Exception e) {
                 log.error("[fail] API 호출 실패: {}", e.getMessage());
@@ -69,6 +61,6 @@ public class RawRestaurantItemReader implements ItemReader<RawRestaurant> {
 
     private int parseTotalCount(String response) throws Exception {
         JsonNode root = new ObjectMapper().readTree(response);
-        return root.path(serviceName).path("list_total_count").asInt();
+        return root.path(apiProperties.getServiceName()).path("list_total_count").asInt();
     }
 }

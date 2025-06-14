@@ -18,23 +18,12 @@ import java.util.concurrent.TimeoutException;
 public class ApiFetcher {
 
     private final WebClient.Builder webClient;
-
-    @Value("${api.key}")
-    private String apiKey;
-
-    @Value("${api.base-url}")
-    private String baseUrl;
-
-    @Value("${api.service-name}")
-    private String serviceName;
-
-    @Value("${api.format-type}")
-    private String formatType;
+    private final ApiProperties apiProperties;
 
     @Retryable(value = {WebClientResponseException.class, TimeoutException.class}, maxAttempts = 3, backoff = @Backoff(delay = 2000, multiplier = 2))
     public Mono<String> fetchData(int start, int end) {
         return webClient
-                .baseUrl(baseUrl)
+                .baseUrl(apiProperties.getBaseUrl())
                 .build()
                 .get()
                 .uri(buildUri(start, end))
@@ -44,6 +33,11 @@ public class ApiFetcher {
     }
 
     private String buildUri(int start, int end) {
-        return String.format("%s/%s/%s/%d/%d", apiKey, formatType, serviceName, start, end);
+        return String.format("%s/%s/%s/%d/%d",
+                apiProperties.getKey(),
+                apiProperties.getFormatType(),
+                apiProperties.getServiceName(),
+                start,
+                end);
     }
 }
