@@ -28,6 +28,12 @@ public class MemberLocationService {
         redis.saveRealTimeLocation(memberId, dto.lon(), dto.lat());
     }
 
+    public MemberLocationResponseDto getRealTimeLocation(Long memberId) {
+        getMemberById(memberId);
+        Point point = redis.getRealTimeLocation(memberId);
+        return new MemberLocationResponseDto(point.getX(), point.getY());
+    }
+
     private Member getMemberById(Long id) {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new BusinessLogicException(MemberExceptionCode.MEMBER_NOT_FOUND));

@@ -22,4 +22,11 @@ public class MemberLocationController {
         memberLocationService.saveRealTimeLocation(dto, memberId);
         return ResponseEntity.status(201).build();
     }
+
+    @GetMapping("/real-time")
+    public ResponseEntity<MemberLocationResponseDto> getRealTimeLocation(@AuthenticationPrincipal Long memberId) {
+        MemberLocationResponseDto location = memberLocationService.getRealTimeLocation(memberId);
+        return ResponseEntity.ok(location);
+    }
+
 }
