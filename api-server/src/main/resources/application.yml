@@ -35,6 +35,11 @@ cookie:
   cookie-name: refresh-token
   domain: localhost
 
+app:
+  member:
+    anonymized-name: 탈퇴회원
+    anonymized-email: deleted@example.com
+
 logging:
   level:
     org.hibernate.SQL: DEBUG
