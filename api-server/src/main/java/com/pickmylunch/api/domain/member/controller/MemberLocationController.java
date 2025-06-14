@@ -59,4 +59,10 @@ public class MemberLocationController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/static/{locationId}")
+    public ResponseEntity<Void> deleteStaticLocation(@PathVariable Long locationId, @AuthenticationPrincipal Long memberId) {
+        memberLocationService.deleteStaticLocation(locationId, memberId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

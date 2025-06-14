@@ -65,6 +65,11 @@ public class MemberLocationService {
         memberLocationRepository.save(location);
     }
 
+    public void deleteStaticLocation(Long locationId, Long memberId) {
+        MemberLocation location = findByIdAndMemberId(locationId, memberId);
+        memberLocationRepository.delete(location);
+    }
+
     private void resetMemberDefaultLocation(Long memberId) {
         memberLocationRepository.resetDefaultLocation(memberId);
     }
