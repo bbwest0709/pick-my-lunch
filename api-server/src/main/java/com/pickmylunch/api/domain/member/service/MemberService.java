@@ -22,4 +22,8 @@ public class MemberService {
         return memberRepository.existsByMemberName(memberName);
     }
 
+    public boolean isEmailExist(String email) {
+        return memberRepository.existsByEmail(email);
+    }
+
 }
