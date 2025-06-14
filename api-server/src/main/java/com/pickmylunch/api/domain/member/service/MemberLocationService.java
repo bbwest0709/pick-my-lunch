@@ -52,9 +52,31 @@ public class MemberLocationService {
         return StaticLocationResponseDto.of(defaultLocation);
     }
 
-    private MemberLocation findDefaultLocation(Long memberId) {
-        return memberLocationRepository.findByMemberIdAndIsDefaultTrue(memberId)
-                .orElseThrow(() -> new BusinessLogicException(MemberExceptionCode.DEFAULT_LOCATION_NOT_FOUND));
+    public void changeDefaultStaticLocation(Long locationId, Long memberId) {
+        resetMemberDefaultLocation(memberId);
+        MemberLocation locationToBeDefault = findByIdAndMemberId(locationId, memberId);
+        locationToBeDefault.changeIsDefault(true);
+        memberLocationRepository.save(locationToBeDefault);
+    }
+
+    public void updateStaticLocation(Long locationId, Long memberId, StaticLocationUpdateRequestDto dto) {
+        MemberLocation location = findByIdAndMemberId(locationId, memberId);
+        location.update(dto.name(), dto.lat(), dto.lon());
+        memberLocationRepository.save(location);
+    }
+
+    private void resetMemberDefaultLocation(Long memberId) {
+        memberLocationRepository.resetDefaultLocation(memberId);
+    }
+
+    private MemberLocation createLocation(StaticLocationRequestDto dto, Long memberId) {
+        Member member = getMemberById(memberId);
+        return dto.of(member);
+    }
+
+    private MemberLocation findByIdAndMemberId(Long locationId, Long memberId) {
+        return memberLocationRepository.findByIdAndMemberId(locationId, memberId)
+                .orElseThrow(() -> new BusinessLogicException(MemberExceptionCode.LOCATION_NOT_FOUNT));
     }
 
     private List<MemberLocation> findMemberLocations(Long memberId) {
@@ -69,18 +91,13 @@ public class MemberLocationService {
         }
     }
 
-    private void resetMemberDefaultLocation(Long memberId) {
-        memberLocationRepository.resetDefaultLocation(memberId);
-    }
-
-    private MemberLocation createLocation(StaticLocationRequestDto dto, Long memberId) {
-        Member member = getMemberById(memberId);
-        return dto.of(member);
+    private MemberLocation findDefaultLocation(Long memberId) {
+        return memberLocationRepository.findByMemberIdAndIsDefaultTrue(memberId)
+                .orElseThrow(() -> new BusinessLogicException(MemberExceptionCode.DEFAULT_LOCATION_NOT_FOUND));
     }
 
     private Member getMemberById(Long id) {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new BusinessLogicException(MemberExceptionCode.MEMBER_NOT_FOUND));
     }
-
 }

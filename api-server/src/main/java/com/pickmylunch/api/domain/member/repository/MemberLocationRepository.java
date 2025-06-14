@@ -10,6 +10,7 @@ import java.util.*;
 public interface MemberLocationRepository extends JpaRepository<MemberLocation, Long> {
     List<MemberLocation> findByMemberId(Long memberId);
     Optional<MemberLocation> findByMemberIdAndIsDefaultTrue(Long memberId);
+    Optional<MemberLocation> findByIdAndMemberId(Long locationId, Long memberId);
 
     @Modifying
     @Transactional

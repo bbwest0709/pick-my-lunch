@@ -47,4 +47,16 @@ public class MemberLocationController {
         return ResponseEntity.ok(location);
     }
 
+    @PatchMapping("/static/{locationId}/change-default")
+    public ResponseEntity<Void> changeDefaultStaticLocation(@PathVariable Long locationId, @AuthenticationPrincipal Long memberId) {
+        memberLocationService.changeDefaultStaticLocation(locationId, memberId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/static/{locationId}")
+    public ResponseEntity<Void> updateStaticLocation(@PathVariable Long locationId, @AuthenticationPrincipal Long memberId, @RequestBody StaticLocationUpdateRequestDto dto) {
+        memberLocationService.updateStaticLocation(locationId, memberId, dto);
+        return ResponseEntity.ok().build();
+    }
+
 }
