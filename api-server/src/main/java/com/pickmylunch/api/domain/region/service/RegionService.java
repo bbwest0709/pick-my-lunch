@@ -1,6 +1,7 @@
 package com.pickmylunch.api.domain.region.service;
 
 import com.pickmylunch.api.domain.region.repository.*;
+import com.pickmylunch.api.domain.region.util.CSVHeaders;
 import com.pickmylunch.api.global.exception.BusinessLogicException;
 import com.pickmylunch.api.global.exception.code.CommonExceptionCode;
 import com.pickmylunch.common.entity.*;

@@ -1,4 +1,4 @@
-package com.pickmylunch.api.domain.region.service;
+package com.pickmylunch.api.domain.region.util;
 
 public final class CSVHeaders {
     public static final String DOSI = "시도명";
