@@ -47,6 +47,16 @@ public class MemberLocationService {
                 .toList();
     }
 
+    public StaticLocationResponseDto getDefaultStaticLocation(Long memberId) {
+        MemberLocation defaultLocation = findDefaultLocation(memberId);
+        return StaticLocationResponseDto.of(defaultLocation);
+    }
+
+    private MemberLocation findDefaultLocation(Long memberId) {
+        return memberLocationRepository.findByMemberIdAndIsDefaultTrue(memberId)
+                .orElseThrow(() -> new BusinessLogicException(MemberExceptionCode.DEFAULT_LOCATION_NOT_FOUND));
+    }
+
     private List<MemberLocation> findMemberLocations(Long memberId) {
         List<MemberLocation> locations = memberLocationRepository.findByMemberId(memberId);
         checkIfLocationsExist(locations);

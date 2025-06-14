@@ -41,4 +41,10 @@ public class MemberLocationController {
         return ResponseEntity.ok(locations);
     }
 
+    @GetMapping("/static/default")
+    public ResponseEntity<StaticLocationResponseDto> getDefaultStaticLocation(@AuthenticationPrincipal Long memberId) {
+        StaticLocationResponseDto location = memberLocationService.getDefaultStaticLocation(memberId);
+        return ResponseEntity.ok(location);
+    }
+
 }
