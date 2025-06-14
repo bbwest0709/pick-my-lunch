@@ -38,4 +38,10 @@ public class MemberController {
     public ResponseEntity<MemberResponseDto> getMyInfo(@AuthenticationPrincipal Long id) {
         return ResponseEntity.ok(memberService.getMemberInfo(id));
     }
+
+    @PatchMapping("/me/alerts/recommendation")
+    public ResponseEntity<Void> updateRecommendationAlerts(@AuthenticationPrincipal Long id, @RequestParam("enabled") boolean enabled) {
+        memberService.updateRecommendationAlertsEnabled(id, enabled);
+        return ResponseEntity.ok().build();
+    }
 }

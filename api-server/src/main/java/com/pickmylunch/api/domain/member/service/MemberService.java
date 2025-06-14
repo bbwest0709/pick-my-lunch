@@ -46,4 +46,10 @@ public class MemberService {
                 .orElseThrow(() -> new BusinessLogicException(MemberExceptionCode.MEMBER_NOT_FOUND));
     }
 
+    public void updateRecommendationAlertsEnabled(long id, boolean enabled) {
+        Member member = getMemberById(id);
+        member.updateRecommendationOptIn(enabled);
+        memberRepository.save(member);
+    }
+
 }
