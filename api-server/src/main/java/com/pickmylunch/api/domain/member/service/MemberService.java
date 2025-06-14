@@ -2,7 +2,10 @@ package com.pickmylunch.api.domain.member.service;
 
 import com.pickmylunch.api.domain.member.MemberProperties;
 import com.pickmylunch.api.domain.member.dto.request.RegisterDto;
+import com.pickmylunch.api.domain.member.dto.response.MemberResponseDto;
 import com.pickmylunch.api.domain.member.repository.MemberRepository;
+import com.pickmylunch.api.global.exception.BusinessLogicException;
+import com.pickmylunch.api.global.exception.code.MemberExceptionCode;
 import com.pickmylunch.common.entity.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +34,16 @@ public class MemberService {
     public void register(RegisterDto dto) {
         Member member = dto.of(passwordEncoder.encode(dto.password()));
         memberRepository.save(member);
+    }
+
+    @Transactional(readOnly = true)
+    public MemberResponseDto getMemberInfo(Long id) {
+        return MemberResponseDto.of(getMemberById(id));
+    }
+
+    private Member getMemberById(Long id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new BusinessLogicException(MemberExceptionCode.MEMBER_NOT_FOUND));
     }
 
 }

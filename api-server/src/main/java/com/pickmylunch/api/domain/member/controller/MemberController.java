@@ -33,4 +33,9 @@ public class MemberController {
         boolean exists = memberService.isEmailExist(email);
         return ResponseEntity.ok(exists);
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<MemberResponseDto> getMyInfo(@AuthenticationPrincipal Long id) {
+        return ResponseEntity.ok(memberService.getMemberInfo(id));
+    }
 }
