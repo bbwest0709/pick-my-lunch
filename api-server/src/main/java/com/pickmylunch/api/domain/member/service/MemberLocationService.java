@@ -41,6 +41,24 @@ public class MemberLocationService {
         memberLocationRepository.save(newLocation);
     }
 
+    public List<StaticLocationResponseDto> getAllStaticLocations(Long memberId) {
+        return findMemberLocations(memberId).stream()
+                .map(StaticLocationResponseDto::of)
+                .toList();
+    }
+
+    private List<MemberLocation> findMemberLocations(Long memberId) {
+        List<MemberLocation> locations = memberLocationRepository.findByMemberId(memberId);
+        checkIfLocationsExist(locations);
+        return locations;
+    }
+
+    private void checkIfLocationsExist(List<MemberLocation> locations) {
+        if (locations.isEmpty()) {
+            throw new BusinessLogicException(MemberExceptionCode.LOCATION_NOT_FOUNT);
+        }
+    }
+
     private void resetMemberDefaultLocation(Long memberId) {
         memberLocationRepository.resetDefaultLocation(memberId);
     }

@@ -35,5 +35,10 @@ public class MemberLocationController {
         return ResponseEntity.status(201).build();
     }
 
+    @GetMapping("/static")
+    public ResponseEntity<List<StaticLocationResponseDto>> getAllStaticLocations(@AuthenticationPrincipal Long memberId) {
+        List<StaticLocationResponseDto> locations = memberLocationService.getAllStaticLocations(memberId);
+        return ResponseEntity.ok(locations);
+    }
 
 }
