@@ -29,4 +29,11 @@ public class MemberLocationController {
         return ResponseEntity.ok(location);
     }
 
+    @PostMapping("/static")
+    public ResponseEntity<Void> saveStaticLocation(@RequestBody StaticLocationRequestDto dto, @AuthenticationPrincipal Long memberId) {
+        memberLocationService.saveStaticLocation(dto, memberId);
+        return ResponseEntity.status(201).build();
+    }
+
+
 }

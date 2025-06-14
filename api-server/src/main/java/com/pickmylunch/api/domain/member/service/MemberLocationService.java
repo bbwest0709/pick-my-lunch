@@ -34,6 +34,22 @@ public class MemberLocationService {
         return new MemberLocationResponseDto(point.getX(), point.getY());
     }
 
+    public void saveStaticLocation(StaticLocationRequestDto dto, Long memberId) {
+        resetMemberDefaultLocation(memberId);
+        MemberLocation newLocation = createLocation(dto, memberId);
+        newLocation.changeIsDefault(true);
+        memberLocationRepository.save(newLocation);
+    }
+
+    private void resetMemberDefaultLocation(Long memberId) {
+        memberLocationRepository.resetDefaultLocation(memberId);
+    }
+
+    private MemberLocation createLocation(StaticLocationRequestDto dto, Long memberId) {
+        Member member = getMemberById(memberId);
+        return dto.of(member);
+    }
+
     private Member getMemberById(Long id) {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new BusinessLogicException(MemberExceptionCode.MEMBER_NOT_FOUND));
