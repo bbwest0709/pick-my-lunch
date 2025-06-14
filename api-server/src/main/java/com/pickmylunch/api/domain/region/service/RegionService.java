@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.*;
 import java.util.*;
 import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -24,6 +25,8 @@ public class RegionService {
 
     private final RegionRepository regionRepository;
 
+    private static final String REGION_KEY_FORMAT = "%s_%s";
+
     @PostConstruct
     public void importRegionsFromCSV() {
         ClassPathResource resource = new ClassPathResource("region/seoul_district_centroids_2017.csv");
@@ -32,13 +35,23 @@ public class RegionService {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(csvInputStream, StandardCharsets.UTF_8));
                 CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader())
         ) {
+            long startTime = System.currentTimeMillis();
+            Set<String> existingRegionKeys = getExistingRegionKeys();
             List<Region> regions = new ArrayList<>();
+            long endTime = System.currentTimeMillis();
+            log.info("중복 체크(existingRegionKeys 조회)에 걸린 시간: {} ms", (endTime - startTime));
 
             for (CSVRecord record : csvParser) {
                 String dosi = record.get(CSVHeaders.DOSI);
                 String sigungu = record.get(CSVHeaders.SIGUNGU);
                 double lon = Double.parseDouble(record.get(CSVHeaders.LON));
                 double lat = Double.parseDouble(record.get(CSVHeaders.LAT));
+
+                String regionKey = String.format(REGION_KEY_FORMAT, dosi, sigungu);
+
+                if (existingRegionKeys.contains(regionKey)) {
+                    continue;
+                }
 
                 Region region = toEntity(dosi, sigungu, lon, lat);
                 regions.add(region);
@@ -48,6 +61,12 @@ public class RegionService {
             log.error("CSV 파싱 에러 : {}", e.getMessage());
             throw new BusinessLogicException(CommonExceptionCode.CSV_PARSING_ERROR);
         }
+    }
+
+    private Set<String> getExistingRegionKeys() {
+        return regionRepository.findAllDosiAndSigungu().stream()
+                .map(region -> String.format(REGION_KEY_FORMAT, region.getDosi(), region.getSigungu()))
+                .collect(Collectors.toSet());
     }
 
     private static Region toEntity(String dosi, String sigungu, double lon, double lat) {
