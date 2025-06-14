@@ -35,11 +35,8 @@ public class RegionService {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(csvInputStream, StandardCharsets.UTF_8));
                 CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader())
         ) {
-            long startTime = System.currentTimeMillis();
             Set<String> existingRegionKeys = getExistingRegionKeys();
             List<Region> regions = new ArrayList<>();
-            long endTime = System.currentTimeMillis();
-            log.info("중복 체크(existingRegionKeys 조회)에 걸린 시간: {} ms", (endTime - startTime));
 
             for (CSVRecord record : csvParser) {
                 String dosi = record.get(CSVHeaders.DOSI);
