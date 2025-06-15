@@ -1,6 +1,5 @@
-package com.pickmylunch.api.domain.region.repository.projection;
+package com.pickmylunch.api.domain.region.repository;
 
-import com.pickmylunch.api.domain.region.repository.*;
 import com.pickmylunch.common.entity.*;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
