@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class RegionService {
+public class CSVRegionService {
 
     private final RegionRepository regionRepository;
 
