@@ -43,6 +43,7 @@ public class SecurityConfig {
                                         .requestMatchers("/api/members/exists/**").permitAll()
                                         .requestMatchers("/api/members").permitAll()
                                         .requestMatchers("/api/login", "/api/auth/reissue").permitAll()
+                                        .requestMatchers("/api/region/**").permitAll()
                                         .requestMatchers("/api/members/me/**", "/api/members/me/alerts/recommendation").authenticated()
                                         .requestMatchers("/api/members/locations/**").authenticated()
                                         .anyRequest().authenticated()
