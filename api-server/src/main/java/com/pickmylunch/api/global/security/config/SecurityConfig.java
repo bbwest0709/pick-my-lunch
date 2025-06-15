@@ -40,9 +40,11 @@ public class SecurityConfig {
                         authorize ->
                                 authorize
                                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                                        .requestMatchers("/api/login", "/api/auth/reissue", "/api/members/exists").permitAll()
-                                        .requestMatchers(HttpMethod.POST, "/api/members").permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/api/members").authenticated()
+                                        .requestMatchers("/api/members/exists/**").permitAll()
+                                        .requestMatchers("/api/members").permitAll()
+                                        .requestMatchers("/api/login", "/api/auth/reissue").permitAll()
+                                        .requestMatchers("/api/members/me/**", "/api/members/me/alerts/recommendation").authenticated()
+                                        .requestMatchers("/api/members/locations/**").authenticated()
                                         .anyRequest().authenticated()
                 )
                 .sessionManagement(

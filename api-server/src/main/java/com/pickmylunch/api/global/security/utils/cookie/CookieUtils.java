@@ -4,34 +4,26 @@ import com.pickmylunch.api.global.exception.BusinessLogicException;
 import com.pickmylunch.api.global.exception.code.AuthExceptionCode;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 
 @Component
+@RequiredArgsConstructor
 public class CookieUtils {
 
-    @Value("${cookie.cookie-name}")
-    private String cookieName;
-
-    @Value("${cookie.domain}")
-    private String cookieDomain;
-
-    @Value("${cookie.accepted-url}")
-    private String cookieAcceptedUrl;
-
-    @Value("${cookie.limit-time}")
-    private int cookieLimitTime;
+    private final CookieProperties cookieProperties;
 
     public Cookie createCookie(String key) {
-        Cookie cookie = new Cookie(cookieName, key);
+        Cookie cookie = new Cookie(cookieProperties.getCookieName(), key);
 
         cookie.setHttpOnly(true);
 //        cookie.setSecure(true);
-        cookie.setDomain(cookieDomain);
-        cookie.setPath(cookieAcceptedUrl);
-        cookie.setMaxAge(cookieLimitTime);
+        cookie.setDomain(cookieProperties.getDomain());
+        cookie.setPath(cookieProperties.getAcceptedUrl());
+        cookie.setMaxAge(cookieProperties.getLimitTime());
         return cookie;
     }
 
@@ -43,14 +35,14 @@ public class CookieUtils {
 
     private Cookie searchCookieProperties(Cookie[] cookies) {
         return Arrays.stream(cookies)
-                .filter(cookie -> cookie.getName().equals(cookieName))
+                .filter(cookie -> cookie.getName().equals(cookieProperties.getCookieName()))
                 .findFirst()
-                .orElse(new Cookie(cookieName, ""));
+                .orElse(new Cookie(cookieProperties.getCookieName(), ""));
     }
 
     public Cookie searchCookieProperties(HttpServletRequest request) {
         return Arrays.stream(validCookiesExist(request))
-                .filter(cookie -> cookie.getName().equals(cookieName))
+                .filter(cookie -> cookie.getName().equals(cookieProperties.getCookieName()))
                 .findFirst()
                 .orElseThrow(() -> new BusinessLogicException(AuthExceptionCode.REFRESH_TOKEN_EXPIRED));
     }

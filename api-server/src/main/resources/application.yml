@@ -27,13 +27,18 @@ jwt:
   access-token-validity-in-minutes: 25
   refresh-token-validity-in-minutes: 4320
   access-header: Authentication
-  refresh-header: Refresh
+  refresh-header: refresh-token
 
 cookie:
   limit-time: 259200
   accepted-url: '/api/auth/reissue'
   cookie-name: refresh-token
   domain: localhost
+
+app:
+  member:
+    anonymized-name: 탈퇴회원
+    anonymized-email: deleted@example.com
 
 logging:
   level:

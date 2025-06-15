@@ -1,16 +1,11 @@
 package com.pickmylunch.api.global.security.filter;
 
-import com.pickmylunch.api.global.exception.code.AuthExceptionCode;
 import com.pickmylunch.api.global.security.details.AuthUser;
 import com.pickmylunch.api.global.security.utils.jwt.JwtProvider;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -36,12 +31,12 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
     }
 
     private void setAuthenticationToContext(HttpServletRequest request) {
-        SecurityContextHolder.getContext().setAuthentication(createAuthenticatiedToken(request));
+        SecurityContextHolder.getContext().setAuthentication(createAuthenticatedToken(request));
     }
 
-    private Authentication createAuthenticatiedToken(HttpServletRequest request) {
+    private Authentication createAuthenticatedToken(HttpServletRequest request) {
         AuthUser authUser = createUserDetail(request);
-        return new UsernamePasswordAuthenticationToken(authUser.getId(), null, authUser.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(authUser, null, authUser.getAuthorities());
     }
 
     private AuthUser createUserDetail(HttpServletRequest request) {

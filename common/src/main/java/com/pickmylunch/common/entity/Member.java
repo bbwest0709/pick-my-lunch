@@ -21,7 +21,7 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private String password;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String email;
 
     @Enumerated(EnumType.STRING)
@@ -29,4 +29,19 @@ public class Member extends BaseEntity {
 
     @Builder.Default
     private boolean active = true;
+
+    private boolean recommendationOptIn;
+
+    public void updateRecommendationOptIn(boolean enabled) {
+        this.recommendationOptIn = enabled;
+    }
+
+    public void deactivate() {
+        this.active = false;
+    }
+
+    public void anonymize(String anonymizedName, String anonymizedEmail) {
+        this.memberName = anonymizedName;
+        this.email = anonymizedEmail;
+    }
 }
