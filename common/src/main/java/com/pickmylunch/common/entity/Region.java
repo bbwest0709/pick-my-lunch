@@ -2,6 +2,7 @@ package com.pickmylunch.common.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.locationtech.jts.geom.Point;
 
 @Entity
 @Getter
@@ -22,4 +23,7 @@ public class Region {
 
     private double lon;
     private double lat;
+
+    @Column(columnDefinition = "geometry(Point, 4326)")
+    private Point location;
 }
