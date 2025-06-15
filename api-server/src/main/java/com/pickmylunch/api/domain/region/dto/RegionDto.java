@@ -12,4 +12,13 @@ public record RegionDto(String dosi, String sigungu, double lon, double lat) {
                 .lat(dto.lat())
                 .build();
     }
+
+    public static RegionDto from(Region region) {
+        return new RegionDto(
+                region.getDosi(),
+                region.getSigungu(),
+                region.getLon(),
+                region.getLat()
+        );
+    }
 }
