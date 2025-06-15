@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.*;
 
 public interface RegionRepository extends JpaRepository<Region, Long> {
-    @Query("SELECT r.dosi, r.sigungu FROM Region r")
+    @Query("SELECT r.dosi AS dosi, r.sigungu AS sigungu FROM Region r")
     List<RegionKeyView> findAllDosiAndSigungu();
 }
