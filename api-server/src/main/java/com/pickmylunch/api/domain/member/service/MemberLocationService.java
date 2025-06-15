@@ -52,10 +52,10 @@ public class MemberLocationService {
         return StaticLocationResponseDto.of(defaultLocation);
     }
 
-    public void changeDefaultStaticLocation(Long locationId, Long memberId) {
-        resetMemberDefaultLocation(memberId);
+    public void changeDefaultStaticLocation(Long locationId, Long memberId, boolean isDefault) {
         MemberLocation locationToBeDefault = findByIdAndMemberId(locationId, memberId);
-        locationToBeDefault.changeIsDefault(true);
+        if (isDefault) resetMemberDefaultLocation(memberId);
+        locationToBeDefault.changeIsDefault(isDefault);
         memberLocationRepository.save(locationToBeDefault);
     }
 
