@@ -32,7 +32,7 @@ public class MemberService {
     }
 
     public void register(RegisterDto dto) {
-        Member member = dto.of(passwordEncoder.encode(dto.password()));
+        Member member = dto.of(passwordEncoder);
         memberRepository.save(member);
     }
 
