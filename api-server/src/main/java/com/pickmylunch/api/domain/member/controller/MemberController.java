@@ -29,7 +29,7 @@ public class MemberController {
     }
 
     @GetMapping("/exists/email")
-    public ResponseEntity<Boolean> checkDuplicateEmail(@RequestParam String email) {
+    public ResponseEntity<Boolean> checkDuplicateEmail(@RequestParam("email") String email) {
         return ResponseEntity.ok(memberService.isEmailExist(email));
     }
 
