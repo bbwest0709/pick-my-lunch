@@ -1,29 +1,25 @@
 package com.pickmylunch.api.domain.region.service;
 
-import com.pickmylunch.api.domain.region.dto.RegionDto;
-import com.pickmylunch.api.domain.region.repository.RegionRepository;
+import com.pickmylunch.api.domain.region.dto.*;
+import com.pickmylunch.api.domain.region.repository.*;
 import com.pickmylunch.api.domain.region.util.CSVHeaders;
 import com.pickmylunch.api.global.exception.BusinessLogicException;
 import com.pickmylunch.api.global.exception.code.CommonExceptionCode;
-import com.pickmylunch.common.entity.Region;
+import com.pickmylunch.common.entity.*;
+import com.pickmylunch.common.util.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.csv.*;
+import org.locationtech.jts.geom.Point;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Service
@@ -34,6 +30,7 @@ public class CSVRegionService {
     private final RegionRepository regionRepository;
 
     private static final String REGION_KEY_FORMAT = "%s_%s";
+    private final GeometryUtil geometryUtil;
 
     @PostConstruct
     public void importRegionsFromCSV() {
@@ -58,7 +55,8 @@ public class CSVRegionService {
                     continue;
                 }
 
-                RegionDto dto = new RegionDto(dosi, sigungu, lon, lat);
+                Point location = createLocationPoint(lon, lat);
+                RegionDto dto = new RegionDto(dosi, sigungu, lon, lat, location);
                 regions.add(RegionDto.of(dto));
             }
             regionRepository.saveAll(regions);
@@ -66,6 +64,10 @@ public class CSVRegionService {
             log.error("CSV 파싱 에러 : {}", e.getMessage());
             throw new BusinessLogicException(CommonExceptionCode.CSV_PARSING_ERROR);
         }
+    }
+
+    private Point createLocationPoint(double lon, double lat) {
+        return geometryUtil.createPoint(lon, lat);
     }
 
     private Set<String> getExistingRegionKeys() {
