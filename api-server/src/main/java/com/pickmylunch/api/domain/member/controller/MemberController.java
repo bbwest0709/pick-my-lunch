@@ -3,6 +3,7 @@ package com.pickmylunch.api.domain.member.controller;
 import com.pickmylunch.api.domain.member.dto.request.*;
 import com.pickmylunch.api.domain.member.dto.response.*;
 import com.pickmylunch.api.domain.member.service.*;
+import com.pickmylunch.api.global.security.details.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,19 +34,19 @@ public class MemberController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<MemberResponseDto> getMyInfo(@AuthenticationPrincipal Long id) {
-        return ResponseEntity.ok(memberService.getMemberInfo(id));
+    public ResponseEntity<MemberResponseDto> getMyInfo(@AuthenticationPrincipal AuthUser user) {
+        return ResponseEntity.ok(memberService.getMemberInfo(user.getId()));
     }
 
     @PatchMapping("/me/alerts/recommendation")
-    public ResponseEntity<Void> updateRecommendationAlerts(@AuthenticationPrincipal Long id, @RequestParam("enabled") boolean enabled) {
-        memberService.updateRecommendationAlertsEnabled(id, enabled);
+    public ResponseEntity<Void> updateRecommendationAlerts(@AuthenticationPrincipal AuthUser user, @RequestParam("enabled") boolean enabled) {
+        memberService.updateRecommendationAlertsEnabled(user.getId(), enabled);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/me")
-    public ResponseEntity<Void> withdrawMember(@AuthenticationPrincipal Long id) {
-        memberService.deactivateMember(id);
+    public ResponseEntity<Void> withdrawMember(@AuthenticationPrincipal AuthUser user) {
+        memberService.deactivateMember(user.getId());
         return ResponseEntity.noContent().build();
     }
 }
