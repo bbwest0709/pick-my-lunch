@@ -1,21 +1,28 @@
 package com.pickmylunch.api.domain.region.service;
 
-import com.pickmylunch.api.domain.region.repository.*;
+import com.pickmylunch.api.domain.region.dto.RegionDto;
+import com.pickmylunch.api.domain.region.repository.RegionRepository;
 import com.pickmylunch.api.domain.region.util.CSVHeaders;
 import com.pickmylunch.api.global.exception.BusinessLogicException;
 import com.pickmylunch.api.global.exception.code.CommonExceptionCode;
-import com.pickmylunch.common.entity.*;
+import com.pickmylunch.common.entity.Region;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.csv.*;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -31,6 +38,7 @@ public class CSVRegionService {
     @PostConstruct
     public void importRegionsFromCSV() {
         ClassPathResource resource = new ClassPathResource("region/seoul_district_centroids_2017.csv");
+
         try (
                 InputStream csvInputStream = resource.getInputStream();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(csvInputStream, StandardCharsets.UTF_8));
@@ -45,14 +53,13 @@ public class CSVRegionService {
                 double lon = Double.parseDouble(record.get(CSVHeaders.LON));
                 double lat = Double.parseDouble(record.get(CSVHeaders.LAT));
 
-                String regionKey = String.format(REGION_KEY_FORMAT, dosi, sigungu);
-
+                String regionKey = createRegionKey(dosi, sigungu);
                 if (existingRegionKeys.contains(regionKey)) {
                     continue;
                 }
 
-                Region region = toEntity(dosi, sigungu, lon, lat);
-                regions.add(region);
+                RegionDto dto = new RegionDto(dosi, sigungu, lon, lat);
+                regions.add(RegionDto.of(dto));
             }
             regionRepository.saveAll(regions);
         } catch (Exception e) {
@@ -63,16 +70,14 @@ public class CSVRegionService {
 
     private Set<String> getExistingRegionKeys() {
         return regionRepository.findAllDosiAndSigungu().stream()
-                .map(region -> String.format(REGION_KEY_FORMAT, region.getDosi(), region.getSigungu()))
+                .map(region -> createRegionKey(region.getDosi(), region.getSigungu()))
                 .collect(Collectors.toSet());
     }
 
-    private static Region toEntity(String dosi, String sigungu, double lon, double lat) {
-        return Region.builder()
-                .dosi(dosi)
-                .sigungu(sigungu)
-                .lon(lon)
-                .lat(lat)
-                .build();
+    private static String createRegionKey(String dosi, String sigungu) {
+        return String.format(
+                REGION_KEY_FORMAT,
+                dosi.trim().toLowerCase(),
+                sigungu.trim().toLowerCase());
     }
 }
