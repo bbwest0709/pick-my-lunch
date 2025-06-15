@@ -19,4 +19,11 @@ public class RegionController {
     public ResponseEntity<List<RegionDto>> getRegions() {
         return ResponseEntity.ok(regionService.getAllRegions());
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<RegionDto> searchRegions(
+            @RequestParam(required = false) String sigungu) {
+        return ResponseEntity.ok(regionService.searchRegions(sigungu));
+    }
+
 }
