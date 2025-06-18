@@ -43,8 +43,9 @@ public class SecurityConfig {
                                         .requestMatchers("/api/members/exists/**").permitAll()
                                         .requestMatchers("/api/members").permitAll()
                                         .requestMatchers("/api/login", "/api/auth/reissue").permitAll()
-                                        .requestMatchers("/api/region/**").permitAll()
                                         .requestMatchers("/api/members/me/**", "/api/members/me/alerts/recommendation").authenticated()
+                                        .requestMatchers("/api/restaurant/**").permitAll()
+                                        .requestMatchers("/api/region/search").permitAll()
                                         .requestMatchers("/api/members/locations/**").authenticated()
                                         .anyRequest().authenticated()
                 )
@@ -75,8 +76,8 @@ public class SecurityConfig {
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowCredentials(true);
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Location", "Refresh"));
-        configuration.setExposedHeaders(List.of("Authorization", "Refresh"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Location", "refresh-token"));
+        configuration.setExposedHeaders(List.of("Authorization", "refresh-token"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
