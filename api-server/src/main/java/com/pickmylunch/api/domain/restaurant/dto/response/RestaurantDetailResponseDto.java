@@ -2,7 +2,6 @@ package com.pickmylunch.api.domain.restaurant.dto.response;
 
 import com.pickmylunch.common.entity.Restaurant;
 import com.pickmylunch.common.entity.enums.Category;
-import org.locationtech.jts.geom.Point;
 
 public record RestaurantDetailResponseDto(
         String id,
@@ -13,7 +12,8 @@ public record RestaurantDetailResponseDto(
         String sigungu,
         String jibunDetailAddress,
         String doroDetailAddress,
-        Point location,
+        double lon,
+        double lat,
         double ratingAverage,
         long totalViewCount
 ) {
@@ -27,7 +27,8 @@ public record RestaurantDetailResponseDto(
                 restaurant.getSigungu(),
                 restaurant.getJibunDetailAddress(),
                 restaurant.getDoroDetailAddress(),
-                restaurant.getLocation(),
+                restaurant.getLocation().getX(),
+                restaurant.getLocation().getY(),
                 restaurant.getRatingAverage(),
                 restaurant.getTotalViewCount()
         );
