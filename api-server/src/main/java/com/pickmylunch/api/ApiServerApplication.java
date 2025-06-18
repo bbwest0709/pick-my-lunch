@@ -6,7 +6,10 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @EnableJpaAuditing
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {
+		"com.pickmylunch.common",
+		"com.pickmylunch.api"
+})
 @EntityScan(basePackages = {"com.pickmylunch.common.entity"})
 public class ApiServerApplication {
 

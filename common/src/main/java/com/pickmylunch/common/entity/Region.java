@@ -1,12 +1,13 @@
 package com.pickmylunch.common.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.locationtech.jts.geom.Point;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Region {
 
@@ -22,4 +23,7 @@ public class Region {
 
     private double lon;
     private double lat;
+
+    @Column(columnDefinition = "geometry(Point, 4326)")
+    private Point location;
 }
