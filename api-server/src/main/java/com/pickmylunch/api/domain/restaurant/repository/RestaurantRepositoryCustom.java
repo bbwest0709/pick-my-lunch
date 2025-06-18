@@ -4,5 +4,5 @@ import com.pickmylunch.common.entity.Restaurant;
 import org.springframework.data.domain.*;
 
 public interface RestaurantRepositoryCustom {
-    Page<Restaurant> findAllWithPagination(Pageable pageable);
+    Page<Restaurant> findRestaurantsBySigungu(Pageable pageable, String sigungu);
 }
