@@ -1,20 +1,11 @@
 package com.pickmylunch.api.domain.restaurant.controller;
 
-import com.pickmylunch.api.domain.restaurant.dto.response.RestaurantDetailResponseDto;
-import com.pickmylunch.api.domain.restaurant.dto.response.RestaurantResponseDto;
-import com.pickmylunch.api.domain.restaurant.repository.RestaurantRepository;
-import com.pickmylunch.api.domain.restaurant.service.RestaurantService;
-import com.pickmylunch.common.entity.Restaurant;
+import com.pickmylunch.api.domain.restaurant.dto.response.*;
+import com.pickmylunch.api.domain.restaurant.service.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,6 +17,11 @@ public class RestaurantController {
     @GetMapping
     public ResponseEntity<Page<RestaurantResponseDto>> getAllRestaurant(Pageable pageable) {
         return ResponseEntity.ok(restaurantService.getAllRestaurants(pageable));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<RestaurantResponseDto>> getRestaurantsBySigungu(Pageable pageable, @RequestParam(required = false) String sigungu) {
+        return ResponseEntity.ok(restaurantService.getRestaurantsBySigungu(pageable, sigungu));
     }
 
     @GetMapping("/{id}")
