@@ -22,6 +22,14 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
         return new PageImpl<>(query.fetch(), pageable, total);
     }
 
+    @Override
+    public void incrementTotalViewCount(String restaurantId, Long viewCount) {
+        queryFactory.update(restaurant)
+                .set(restaurant.totalViewCount, restaurant.totalViewCount.add(viewCount))
+                .where(restaurant.id.eq(restaurantId))
+                .execute();
+    }
+
     private BooleanExpression condSigungu(String sigungu) {
         return sigungu == null ? null : restaurant.sigungu.eq(sigungu);
     }
