@@ -1,6 +1,7 @@
 package com.pickmylunch.common.entity;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import lombok.*;
 
 @Entity
@@ -12,17 +13,18 @@ public class Rating extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(updatable = false)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name="member_id", nullable=false)
-    private Member member;
+    @Column(nullable = false)
+    private Long memberId;
 
     @ManyToOne
     @JoinColumn(name="restaurant_id", nullable=false)
     private Restaurant restaurant;
 
-    private double score;
+    @Column(precision = 2, scale = 1)
+    private BigDecimal score;
 
     private String content;
 }
