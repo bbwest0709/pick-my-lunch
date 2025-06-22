@@ -1,6 +1,7 @@
 package com.pickmylunch.api.domain.rating.repository;
 
 import com.pickmylunch.common.entity.Rating;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,6 +16,6 @@ public interface RatingRepository extends JpaRepository<Rating, Long> {
             and
               r.memberId = :memberId
         """)
-    Optional<Rating> findByRestaurantIdAndMemberId(@Param("restaurantId") Long restaurantId,
+    Optional<Rating> findByRestaurantIdAndMemberId(@Param("restaurantId") String restaurantId,
         @Param("memberId") Long memberId);
 }

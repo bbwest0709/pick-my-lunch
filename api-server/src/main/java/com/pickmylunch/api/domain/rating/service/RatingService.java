@@ -18,7 +18,7 @@ public class RatingService {
 
     private final RatingRepository ratingRepository;
 
-    public Long postRating(Long restaurantId, PostRatingReqDto reqDto, Long memberId) {
+    public Long postRating(String restaurantId, PostRatingReqDto reqDto, Long memberId) {
         Restaurant savedRestaurant = validRestaurantExist(restaurantId);
         validAlreadyPost(restaurantId, memberId);
 
@@ -47,11 +47,11 @@ public class RatingService {
     * VALID
     * */
     //TODO : Restaurant 관련 구조
-    private Restaurant validRestaurantExist(Long restaurantId) {
+    private Restaurant validRestaurantExist(String restaurantId) {
         return null;
     }
 
-    private void validAlreadyPost(Long restaurantId, Long memberId) {
+    private void validAlreadyPost(String restaurantId, Long memberId) {
         ratingRepository.findByRestaurantIdAndMemberId(restaurantId, memberId)
             .ifPresent(rating -> {
                 throw new BusinessLogicException(RatingExceptionCode.ALREADY_RATE);
@@ -59,7 +59,7 @@ public class RatingService {
     }
 
     private Rating validRatingExist(Long ratingId) {
-        ratingRepository.findById(ratingId)
+        return ratingRepository.findById(ratingId)
             .orElseThrow(() -> new BusinessLogicException(RatingExceptionCode.ENTITY_NOT_FOUND));
     }
 

@@ -9,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -26,7 +24,7 @@ public class RatingController {
 
     @PostMapping("/api/restaurant/rates/{restaurantId}")
     public ResponseEntity<Long> postRating(
-        @PathVariable("restaurantId") Long restaurantId,
+        @PathVariable("restaurantId") String restaurantId,
         @RequestBody PostRatingReqDto reqDto,
         @AuthenticationPrincipal AuthUser authUser) {
         Long result = ratingService.postRating(restaurantId, reqDto, authUser.getId());
