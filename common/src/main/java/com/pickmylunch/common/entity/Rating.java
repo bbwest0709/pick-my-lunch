@@ -27,4 +27,9 @@ public class Rating extends BaseEntity {
     private BigDecimal score;
 
     private String content;
+
+    public void put(Rating reqEntity) {
+        this.score = reqEntity.getScore();
+        this.content = reqEntity.getContent();
+    }
 }
