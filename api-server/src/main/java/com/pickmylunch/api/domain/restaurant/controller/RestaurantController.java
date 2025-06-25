@@ -20,8 +20,13 @@ public class RestaurantController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<RestaurantResponseDto>> getRestaurantsBySigungu(Pageable pageable, @RequestParam(required = false) String sigungu) {
-        return ResponseEntity.ok(restaurantService.getRestaurantsBySigungu(pageable, sigungu));
+    public ResponseEntity<Page<RestaurantResponseDto>> getRestaurantsBySigungu(
+            Pageable pageable,
+            @RequestParam(required = false) String sigungu,
+            @RequestParam(defaultValue = "viewCount") String sort,
+            @RequestParam(defaultValue = "false") boolean ascending) {
+
+        return ResponseEntity.ok(restaurantService.getRestaurantsBySigungu(pageable, sigungu, sort, ascending));
     }
 
     @GetMapping("/{id}")

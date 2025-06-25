@@ -30,8 +30,8 @@ public class RestaurantService {
         return RestaurantDetailResponseDto.of(restaurant);
     }
 
-    public Page<RestaurantResponseDto> getRestaurantsBySigungu(Pageable pageable, String sigungu) {
-        return restaurantRepository.findRestaurantsBySigungu(pageable, sigungu)
+    public Page<RestaurantResponseDto> getRestaurantsBySigungu(Pageable pageable, String sigungu, String sort, boolean ascending) {
+        return restaurantRepository.findRestaurantsBySigungu(pageable, sigungu, sort, ascending)
                 .map(RestaurantResponseDto::of);
     }
 
