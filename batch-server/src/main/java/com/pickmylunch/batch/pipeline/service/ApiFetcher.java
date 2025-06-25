@@ -33,7 +33,7 @@ public class ApiFetcher {
     }
 
     private String buildUri(int start, int end) {
-        return MessageFormat.format("{0}/{1}/{2}/{3}/{4}",
+        return String.format("%s/%s/%s/%d/%d",
                 apiProperties.getKey(),
                 apiProperties.getFormatType(),
                 apiProperties.getServiceName(),
