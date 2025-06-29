@@ -24,12 +24,12 @@ public class MemberController {
     }
 
     @GetMapping("/exists/member-name")
-    public ResponseEntity<Boolean> checkDuplicateMemberName(@RequestParam("memberName") String memberName) {
+    public ResponseEntity<Boolean> checkDuplicateMemberName(@RequestParam("member-name") String memberName) {
         return ResponseEntity.ok(memberService.isMemberNameExist(memberName));
     }
 
     @GetMapping("/exists/email")
-    public ResponseEntity<Boolean> checkDuplicateEmail(@RequestParam String email) {
+    public ResponseEntity<Boolean> checkDuplicateEmail(@RequestParam("email") String email) {
         return ResponseEntity.ok(memberService.isEmailExist(email));
     }
 

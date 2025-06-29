@@ -41,6 +41,8 @@ dependencies {
 	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+	// proj4j
+	implementation 'org.locationtech.proj4j:proj4j:1.1.1'
 }
 
 tasks.named('test') {

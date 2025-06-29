@@ -86,10 +86,14 @@ public class RestaurantProcessor {
             return null;
         }
 
-        double longitude = Double.parseDouble(x);
-        double latitude = Double.parseDouble(y);
-
-        return geometryUtil.createPoint(longitude, latitude);
+        try {
+            double longitude = Double.parseDouble(x);
+            double latitude = Double.parseDouble(y);
+            return geometryUtil.createPointFromTM(longitude, latitude);
+        } catch (NumberFormatException e) {
+            log.warn("[warn] 좌표 변환 실패 x: {}, y: {}", x, y);
+            return null;
+        }
     }
 
     public boolean shouldUpdate(RawRestaurant rawRestaurant) {

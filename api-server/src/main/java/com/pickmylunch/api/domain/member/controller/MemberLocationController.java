@@ -46,8 +46,8 @@ public class MemberLocationController {
     }
 
     @PatchMapping("/static/{locationId}/change-default")
-    public ResponseEntity<Void> changeDefaultStaticLocation(@PathVariable Long locationId, @AuthenticationPrincipal AuthUser authUser) {
-        memberLocationService.changeDefaultStaticLocation(locationId, authUser.getId());
+    public ResponseEntity<Void> changeDefaultStaticLocation(@PathVariable Long locationId, @AuthenticationPrincipal AuthUser authUser, @RequestParam("is-default") boolean isDefault) {
+        memberLocationService.changeDefaultStaticLocation(locationId, authUser.getId(), isDefault);
         return ResponseEntity.ok().build();
     }
 

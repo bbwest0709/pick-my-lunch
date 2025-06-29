@@ -36,4 +36,8 @@ public class Restaurant {
     private Point location;
 
     private double ratingAverage;
+
+    @Column(nullable = false)
+    private long totalViewCount;
+
 }
