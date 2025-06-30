@@ -1,12 +1,17 @@
 package com.pickmylunch.api.domain.rating.service;
 
+import com.pickmylunch.api.domain.rating.dto.request.FindRatingListResponseDto;
 import com.pickmylunch.api.domain.rating.dto.request.*;
+import com.pickmylunch.api.domain.rating.dto.response.FindRatingListRequestDto;
+import com.pickmylunch.api.domain.rating.dto.response.FindRatingResponseDto;
 import com.pickmylunch.api.domain.rating.repository.RatingRepository;
 import com.pickmylunch.api.domain.restaurant.repository.RestaurantRepository;
 import com.pickmylunch.api.global.exception.BusinessLogicException;
 import com.pickmylunch.api.global.exception.code.*;
 import com.pickmylunch.common.entity.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +51,10 @@ public class RatingService {
                 });
     }
 
+    public Page<FindRatingListResponseDto> findRatingList(FindRatingListRequestDto dto, Pageable pageable) {
+        return ratingRepository.findRatingList(pageable, dto);
+    }
+
     private Restaurant validRestaurantExist(String restaurantId) {
         return restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new BusinessLogicException(RestaurantExceptionCode.RESTAURANT_NOT_FOUND));
@@ -67,5 +76,12 @@ public class RatingService {
         if (!rating.getMemberId().equals(memberId)) {
             throw new BusinessLogicException(RatingExceptionCode.MEMBER_NOT_SAME);
         }
+    }
+
+    public FindRatingResponseDto findRatingDetail(Long ratingId) {
+        return ratingRepository.findRatingDetail(ratingId)
+            .orElseThrow(
+                () -> new BusinessLogicException(RatingExceptionCode.ENTITY_NOT_FOUND)
+            );
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface RatingRepository extends JpaRepository<Rating, Long> {
+public interface RatingRepository extends JpaRepository<Rating, Long>, RatingRepositoryCustom{
 
     Optional<Rating> findByRestaurantIdAndMemberId(String restaurantId, Long memberId);
 }

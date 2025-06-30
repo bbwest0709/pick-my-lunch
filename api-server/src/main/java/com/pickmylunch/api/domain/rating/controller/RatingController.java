@@ -1,10 +1,15 @@
 package com.pickmylunch.api.domain.rating.controller;
 
+import com.pickmylunch.api.domain.rating.dto.request.FindRatingListResponseDto;
 import com.pickmylunch.api.domain.rating.dto.request.*;
+import com.pickmylunch.api.domain.rating.dto.response.FindRatingListRequestDto;
+import com.pickmylunch.api.domain.rating.dto.response.FindRatingResponseDto;
 import com.pickmylunch.api.domain.rating.service.*;
 import com.pickmylunch.api.global.security.details.AuthUser;
 import com.pickmylunch.api.global.util.UrlHelper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -41,5 +46,17 @@ public class RatingController {
             @AuthenticationPrincipal AuthUser authUser) {
         ratingService.delRating(ratingId, authUser.getId());
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<FindRatingListResponseDto>> findRatingList(
+        FindRatingListRequestDto dto, Pageable pageable) {
+        return ResponseEntity.ok(ratingService.findRatingList(dto, pageable));
+    }
+
+    @GetMapping("/{ratingId}")
+    public ResponseEntity<FindRatingResponseDto> findRatingDetail(
+        @PathVariable("ratingId") Long ratingId) {
+        return ResponseEntity.ok(ratingService.findRatingDetail(ratingId));
     }
 }
