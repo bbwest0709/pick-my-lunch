@@ -80,8 +80,8 @@ public class RatingService {
 
     public FindRatingResponseDto findRatingDetail(Long ratingId) {
         return ratingRepository.findRatingDetail(ratingId)
-            .orElseThrow(
-                () -> new BusinessLogicException(RatingExceptionCode.ENTITY_NOT_FOUND)
-            );
+                .orElseThrow(
+                        () -> new BusinessLogicException(RatingExceptionCode.ENTITY_NOT_FOUND)
+                );
     }
 }

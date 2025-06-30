@@ -13,9 +13,11 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.micrometer.common.util.StringUtils;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,39 +31,39 @@ public class RatingRepositoryImpl implements RatingRepositoryCustom {
     @Override
     public Page<FindRatingListResponseDto> findRatingList(Pageable pageable, FindRatingListRequestDto dto) {
         List<FindRatingListResponseDto> content = queryFactory
-            .select(
-                new QFindRatingListResponseDto(
-                    rating.id,
-                    member.id,
-                    member.memberName,
-                    member.email,
-                    rating.score,
-                    rating.content,
-                    rating.createdAt,
-                    rating.updatedAt,
-                    restaurant.id,
-                    restaurant.restaurantName,
-                    restaurant.restaurantTel,
-                    restaurant.category
+                .select(
+                        new QFindRatingListResponseDto(
+                                rating.id,
+                                member.id,
+                                member.memberName,
+                                member.email,
+                                rating.score,
+                                rating.content,
+                                rating.createdAt,
+                                rating.updatedAt,
+                                restaurant.id,
+                                restaurant.restaurantName,
+                                restaurant.restaurantTel,
+                                restaurant.category
+                        )
                 )
-            )
-            .from(rating)
-            .innerJoin(member).on(rating.memberId.eq(member.id))
-            .innerJoin(restaurant).on(rating.restaurant.id.eq(restaurant.id))
-            .where(
-                isRestaurantIdEq(dto.restaurantId()),
-                isMemberIdEq(dto.memberId())
-            )
-            .limit(pageable.getPageSize())
-            .offset(pageable.getOffset())
-            .fetch();
+                .from(rating)
+                .innerJoin(member).on(rating.memberId.eq(member.id))
+                .innerJoin(restaurant).on(rating.restaurant.id.eq(restaurant.id))
+                .where(
+                        isRestaurantIdEq(dto.restaurantId()),
+                        isMemberIdEq(dto.memberId())
+                )
+                .limit(pageable.getPageSize())
+                .offset(pageable.getOffset())
+                .fetch();
 
         JPAQuery<Long> count = queryFactory.select(rating.id.count())
-            .from(rating)
-            .where(
-                isRestaurantIdEq(dto.restaurantId()),
-                isMemberIdEq(dto.memberId())
-            );
+                .from(rating)
+                .where(
+                        isRestaurantIdEq(dto.restaurantId()),
+                        isMemberIdEq(dto.memberId())
+                );
 
         return PageableExecutionUtils.getPage(content, pageable, count::fetchOne);
     }
@@ -69,25 +71,27 @@ public class RatingRepositoryImpl implements RatingRepositoryCustom {
     @Override
     public Optional<FindRatingResponseDto> findRatingDetail(Long ratingId) {
         FindRatingResponseDto entity = queryFactory.select(
-                new QFindRatingResponseDto(
-                    rating.id,
-                    member.id,
-                    member.memberName,
-                    member.email,
-                    rating.score,
-                    rating.content,
-                    rating.createdAt,
-                    rating.updatedAt,
-                    restaurant.id,
-                    restaurant.restaurantName,
-                    restaurant.restaurantTel,
-                    restaurant.category
-                ))
-            .from(rating)
-            .where(
-                rating.id.eq(ratingId)
-            )
-            .fetchOne();
+                        new QFindRatingResponseDto(
+                                rating.id,
+                                member.id,
+                                member.memberName,
+                                member.email,
+                                rating.score,
+                                rating.content,
+                                rating.createdAt,
+                                rating.updatedAt,
+                                restaurant.id,
+                                restaurant.restaurantName,
+                                restaurant.restaurantTel,
+                                restaurant.category
+                        ))
+                .from(rating)
+                .innerJoin(member).on(rating.memberId.eq(member.id))
+                .innerJoin(restaurant).on(rating.restaurant.id.eq(restaurant.id))
+                .where(
+                        rating.id.eq(ratingId)
+                )
+                .fetchOne();
 
         return Optional.ofNullable(entity);
     }

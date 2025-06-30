@@ -50,13 +50,13 @@ public class RatingController {
 
     @GetMapping
     public ResponseEntity<Page<FindRatingListResponseDto>> findRatingList(
-        FindRatingListRequestDto dto, Pageable pageable) {
+            FindRatingListRequestDto dto, Pageable pageable) {
         return ResponseEntity.ok(ratingService.findRatingList(dto, pageable));
     }
 
     @GetMapping("/{ratingId}")
     public ResponseEntity<FindRatingResponseDto> findRatingDetail(
-        @PathVariable("ratingId") Long ratingId) {
+            @PathVariable("ratingId") Long ratingId) {
         return ResponseEntity.ok(ratingService.findRatingDetail(ratingId));
     }
 }
