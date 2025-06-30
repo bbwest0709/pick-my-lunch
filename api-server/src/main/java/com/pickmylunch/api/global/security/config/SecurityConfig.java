@@ -44,6 +44,7 @@ public class SecurityConfig {
                                         .requestMatchers("/api/members").permitAll()
                                         .requestMatchers("/api/login", "/api/auth/reissue").permitAll()
                                         .requestMatchers("/api/members/me/**", "/api/members/me/alerts/recommendation").authenticated()
+                                        .requestMatchers("/api/restaurant/rates/**").authenticated()
                                         .requestMatchers("/api/restaurant/**").permitAll()
                                         .requestMatchers("/api/region/search").permitAll()
                                         .requestMatchers("/api/restaurants/nearby/**").authenticated()
