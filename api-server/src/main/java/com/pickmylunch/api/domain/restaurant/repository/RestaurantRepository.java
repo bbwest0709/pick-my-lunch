@@ -47,4 +47,6 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, String>,
             "ORDER BY function('RANDOM')")
     Optional<Restaurant> findRecommendedRestaurantForMember(Point memberLocation);
 
+    @Query("SELECT r.id FROM Restaurant r WHERE r.totalViewCount >= :threshold")
+    List<String> findIdsByTotalViewCountGreaterThanEqual(@Param("threshold") long threshold);
 }
