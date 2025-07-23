@@ -10,6 +10,9 @@ import com.pickmylunch.api.global.exception.BusinessLogicException;
 import com.pickmylunch.api.global.exception.code.*;
 import com.pickmylunch.common.entity.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,6 +36,7 @@ public class RatingService {
     }
 
     @Transactional(rollbackFor = Exception.class)
+    @CachePut(value = "rating_details", key = "#ratingId")
     public Long putRating(Long ratingId, PutRatingRequestDto reqDto, Long memberId) {
         Rating rating = validRatingExist(ratingId);
         validMemberSame(rating, memberId);
@@ -41,6 +45,7 @@ public class RatingService {
     }
 
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = "rating_details", key = "#ratingId")
     public void delRating(Long ratingId, Long memberId) {
         ratingRepository.findById(ratingId)
                 .ifPresent(rating -> {
@@ -78,6 +83,7 @@ public class RatingService {
         }
     }
 
+    @Cacheable(value = "rating_details", key = "#ratingId")
     public FindRatingResponseDto findRatingDetail(Long ratingId) {
         return ratingRepository.findRatingDetail(ratingId)
                 .orElseThrow(
